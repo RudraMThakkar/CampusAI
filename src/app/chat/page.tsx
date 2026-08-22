@@ -6,11 +6,13 @@ import {
   Zap, Brain, LogOut, ChevronDown, Wand2,
   PanelLeftClose, PanelLeft, ArrowUp, 
   FileText, Image as ImageIcon, X, Loader2,
-  GraduationCap, HelpCircle, Building2, BookOpen, Phone, Layers
+  GraduationCap, HelpCircle, Building2, BookOpen, Phone, Layers,
+  Languages
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 type ModeType = 'auto' | 'gemini' | 'deepseek' | 'grok' | 'admission_kd' | 'student_assistant';
+type Language = 'en' | 'gu' | 'hi';
 
 interface AttachedFile {
   name: string;
@@ -27,10 +29,12 @@ interface Message {
 
 export default function ChatDashboard() {
   const [selectedMode, setSelectedMode] = useState<ModeType>('auto');
+  const [lang, setLang] = useState<Language>('en');
+  const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     { 
       role: 'assistant', 
-      content: 'Welcome to CampusAI. Choose general AI models above or switch to KD Polytechnic Admission & Student Services in the sidebar.' 
+      content: 'Welcome to CampusAI! Ask academic questions, or explore KD Polytechnic Patan admissions and GTU student services.' 
     }
   ]);
   const [input, setInput] = useState('');
@@ -40,13 +44,20 @@ export default function ChatDashboard() {
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const langDropdownRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const langNames: Record<Language, { label: string; native: string }> = {
+    en: { label: 'English', native: 'EN' },
+    gu: { label: 'ગુજરાતી', native: 'ગુજ' },
+    hi: { label: 'हिंदी', native: 'हिं' }
+  };
 
   const modeDetails: Record<ModeType, { name: string; desc: string; badge: string; icon: any }> = {
     auto: { 
       name: 'Auto Router', 
-      desc: 'Dynamic query classifier (Speed, Code, Reasoning)', 
+      desc: 'Dynamic classifier (Speed, Code, Reasoning)', 
       badge: 'Smart',
       icon: Wand2 
     },
@@ -87,6 +98,9 @@ export default function ChatDashboard() {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
+      if (langDropdownRef.current && !langDropdownRef.current.contains(event.target as Node)) {
+        setIsLangDropdownOpen(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -97,19 +111,19 @@ export default function ChatDashboard() {
     setIsDropdownOpen(false);
 
     if (mode === 'admission_kd') {
-      setMessages([
-        {
-          role: 'assistant',
-          content: `**Welcome to K.D. Polytechnic Patan Admission Desk**\n\nI can guide you through:\n* **Step-by-Step ACPDC Admission Process** (Registration, Merit Rank, Choice Filling, Token Fee)\n* **Computer Engineering (CE) Department** (Labs, Curriculum, Faculty Overview)\n* **Government Quota Seats & Reservation** (OPEN, SEBC/OBC, SC, ST, EWS, TFW Scheme)\n* **Facilities & Campus Life** (Hostel, Library, Wi-Fi Labs)\n* **Official Contact & Help Center**\n\nWhat would you like to know first?`
-        }
-      ]);
+      const welcomeText = {
+        en: `**Welcome to K.D. Polytechnic Patan Admission Desk**\n\nI can guide you through:\n* **Step-by-Step ACPDC Admission Process**\n* **Computer Engineering (CE) Department** (Labs, Curriculum, Faculty)\n* **Government Quota Seats & Reservation** (OPEN, SEBC, SC, ST, EWS, TFW)\n* **Official Contact & Help Center**\n\nSelect a chip below or type your question.`,
+        gu: `**કે.ડી. પોલિટેકનિક પાટણ એડમિશન ડેસ્કમાં આપનું સ્વાગત છે**\n\nહું તમને નીચેની બાબતોમાં મદદ કરી શકું છું:\n* **ACPDC એડમિશન પ્રક્રિયા (Step-by-Step)**\n* **કમ્પ્યુટર એન્જિનિયરિંગ ડિપાર્ટમેન્ટ** (લેબ્સ, ફેકલ્ટી, પ્લેસમેન્ટ)\n* **સરકારી ક્વોટા અને સીટોની માહિતી** (TFW, OPEN, SEBC, SC, ST, EWS)\n* **કોલેજ સરનામું અને હેલ્પડેસ્ક સંપર્ક**\n\nનીચેનામાંથી વિકલ્પ પસંદ કરો અથવા પ્રશ્ન પૂછો.`,
+        hi: `**के.डी. पॉलिटेक्निक पाटण एडमिशन हेल्पडेस्क में आपका स्वागत है**\n\nमैं आपकी इन विषयों में सहायता कर सकता हूँ:\n* **ACPDC एडमिशन प्रक्रिया (स्टेप-बाय-स्टेप)**\n* **कंप्यूटर इंजीनियरिंग विभाग** (लैब्स, फैकल्टी, प्लेसमेंट)\n* **सरकारी कोटा और सीट मैट्रिक्स** (TFW, OPEN, SEBC, SC, ST, EWS)\n* **कॉलेज संपर्क और सहायता केंद्र**\n\nनीचे दिए गए सुझाव पर क्लिक करें या अपना प्रश्न पूछें।`
+      };
+      setMessages([{ role: 'assistant', content: welcomeText[lang] }]);
     } else if (mode === 'student_assistant') {
-      setMessages([
-        {
-          role: 'assistant',
-          content: `**CampusAI Student Services Desk**\n\nI can assist with all technical college workflows:\n* **Online Form Filling** (Digital Gujarat Scholarship, ACPDC registration, GTU Exam form)\n* **Document Checklists** (Income certificate, Caste verification, LC, Marksheets)\n* **Resource Finder** (GTU Syllabus, Question Papers, Lab Manuals)\n\nType your query or click a quick action below.`
-        }
-      ]);
+      const welcomeText = {
+        en: `**CampusAI Student Services Desk**\n\nI can assist with:\n* **Online Form Filling** (Digital Gujarat Scholarship, GTU Exam Form)\n* **Document Checklists** (Income certificate, Caste verification, LC)\n* **GTU Resources** (Syllabus, Question Banks, Lab Manuals)\n\nType your query or click a quick action below.`,
+        gu: `**કેમ્પસ-AI વિદ્યાર્થી સેવા કેન્દ્ર**\n\nહું તમને આમાં મદદ કરી શકું છું:\n* **ઓનલાઇન ફોર્મ ભરવા માટે માર્ગદર્શન** (ડિજિટલ ગુજરાત સ્કોલરશિપ, GTU પરીક્ષા ફોર્મ)\n* **જરૂરી ડોક્યુમેન્ટ લિસ્ટ** (આવકનો દાખલો, જાતિ પ્રમાણપત્ર, LC)\n* **GTU અભ્યાસક્રમ અને પેપર્સ**\n\nપ્રશ્ન પૂછો અથવા નીચે આપેલા વિકલ્પ પસંદ કરો.`,
+        hi: `**कैंपस-AI छात्र सहायता केंद्र**\n\nमैं आपकी इन सेवाओं में मदद कर सकता हूँ:\n* **ऑनलाइन फॉर्म भरने का मार्गदर्शन** (डिजिटल गुजरात स्कॉलरशिप, GTU परीक्षा फॉर्म)\n* **आवश्यक दस्तावेज सूची** (आय प्रमाण पत्र, जाति प्रमाण पत्र, LC)\n* **GTU स्टडी मटेरियल और सिलेबस**\n\nअपना प्रश्न लिखें या नीचे दिए गए ऑप्शन चुनें।`
+      };
+      setMessages([{ role: 'assistant', content: welcomeText[lang] }]);
     }
   };
 
@@ -138,33 +152,48 @@ export default function ChatDashboard() {
     setAttachedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const generateSpecializedResponse = (query: string, mode: ModeType) => {
+  const generateSpecializedResponse = (query: string, mode: ModeType, currentLang: Language) => {
     const q = query.toLowerCase();
 
     if (mode === 'admission_kd') {
-      if (q.includes('step') || q.includes('process') || q.includes('acpdc') || q.includes('how to get admission')) {
-        return `**Step-by-Step Admission Process for K.D. Polytechnic, Patan (ACPDC)**\n\n1. **Online ACPDC Registration**: Visit \`gujdiploma.admissions.nic.in\`, register with 10th marksheet and create login ID.\n2. **Document Verification**: Upload 10th marksheet, LC, Caste/Income certificates for online e-verification.\n3. **Merit List Announcement**: Check your State Merit Rank & Category Rank.\n4. **Choice Filling (Crucial Step)**: Put **"K.D. POLYTECHNIC, PATAN (Govt.) - Computer Engineering"** as your highest priority choice.\n5. **Seat Allotment & Token Fee**: Download seat allotment letter and pay the nominal government token fee online to confirm admission.\n6. **Physical Reporting**: Report to the campus in Patan with original documents for document endorsement.`;
+      if (q.includes('step') || q.includes('process') || q.includes('acpdc') || q.includes('પ્રક્રિયા') || q.includes('प्रक्रिया')) {
+        if (currentLang === 'gu') {
+          return `**કે.ડી. પોલિટેકનિક પાટણ: એડમિશન પ્રક્રિયા (ACPDC)**\n\n1. **ઓનલાઇન રજીસ્ટ્રેશન**: \`gujdiploma.admissions.nic.in\` પર જઈને ધોરણ ૧૦ ના આધારે ફોર્મ ભરો.\n2. **ડોક્યુમેન્ટ વેરિફિકેશન**: ૧૦માની માર્કશીટ, LC અને આવક/જાતિના દાખલા ઓનલાઇન અપલોડ કરો.\n3. **મેરિટ લિસ્ટ**: સ્ટેટ મેરિટ રેન્ક જાહેર થયા પછી તમારો રેન્ક ચેક કરો.\n4. **ચોઈસ ફિલિંગ**: ચોઈસ ફિલિંગમાં **"K.D. POLYTECHNIC, PATAN (Govt.) - Computer Engineering"** પ્રથમ ક્રમે રાખો.\n5. **ટોકન ફી અને કન્ફર્મેશન**: એલોટમેન્ટ પત્ર ડાઉનલોડ કરી સરકારી ટોકન ફી ભરી એડમિશન કન્ફર્મ કરો.\n6. **રિપોર્ટિંગ**: ઓરિજિનલ ડોક્યુમેન્ટ્સ સાથે પાટણ કોલેજ કેમ્પસ ખાતે વેરિફિકેશન પૂર્ણ કરો.`;
+        }
+        if (currentLang === 'hi') {
+          return `**के.डी. पॉलिटेक्निक पाटण: स्टेप-बाय-स्टेप एडमिशन प्रक्रिया (ACPDC)**\n\n1. **ऑनलाइन रजिस्ट्रेशन**: \`gujdiploma.admissions.nic.in\` पर 10वीं के विवरण के साथ फॉर्म भरें।\n2. **दस्तावेज़ सत्यापन**: 10वीं मार्कशीट, LC, आय और जाति प्रमाण पत्र अपलोड करें।\n3. **मेरिट लिस्ट**: ACPDC द्वारा जारी मेरिट रैंक चेक करें।\n4. **च्वाइस फिलिंग**: च्वाइस लिस्ट में **"K.D. POLYTECHNIC, PATAN (Govt.) - Computer Engineering"** को पहली प्राथमिकता दें।\n5. **सीट आवंटन व टोकन शुल्क**: सीट अलॉटमेंट लेटर डाउनलोड कर निर्धारित सरकारी टोकन फीस जमा करें।\n6. **कॉलेज रिपोर्टिंग**: मूल दस्तावेजों के साथ पाटण कॉलेज में रिपोर्ट करें।`;
+        }
+        return `**Step-by-Step Admission Process for K.D. Polytechnic, Patan (ACPDC)**\n\n1. **Online ACPDC Registration**: Visit \`gujdiploma.admissions.nic.in\` and register with 10th details.\n2. **Document Verification**: Upload 10th marksheet, LC, Caste/Income certificates for e-verification.\n3. **Merit List**: Check your State Merit Rank & Category Rank.\n4. **Choice Filling**: Select **"K.D. POLYTECHNIC, PATAN (Govt.) - Computer Engineering"** as first preference.\n5. **Seat Allotment & Token Fee**: Download seat allotment letter and submit the online token fee.\n6. **Physical Reporting**: Report to the Patan campus with original credentials.`;
       }
-      if (q.includes('computer') || q.includes('ce') || q.includes('faculty') || q.includes('lab')) {
-        return `**Computer Engineering Department Overview**\n\n* **Labs & Infrastructure**: High-speed internet connected labs equipped for Python, C/C++, Database systems, Web Development, and Networking.\n* **Faculty**: Qualified Government-appointed lecturers offering dedicated guidance for GTU examinations and diploma projects.\n* **Placement & Pathways**: Direct Second Year Degree (D2D) admission support in top engineering colleges (LDCE, VGEC, GEC) and industrial placement drives.`;
+
+      if (q.includes('computer') || q.includes('ce') || q.includes('કમ્પ્યુટર') || q.includes('कंप्यूटर')) {
+        if (currentLang === 'gu') {
+          return `**કમ્પ્યુટર એન્જિનિયરિંગ ડિપાર્ટમેન્ટ (KDPC પાટણ)**\n\n* **લેબ ફેસિલિટી**: હાઈ-સ્પીડ ઈન્ટરનેટ અને પ્રોગ્રામિંગ (Python, C/C++, Web Dev, AI) માટે સંપૂર્ણ સજ્જ કમ્પ્યુટર લેબ્સ.\n* **અભ્યાસક્રમ**: GTU આધારિત અદ્યતન ડિપ્લોમા એન્જિનિયરિંગ સિલેબસ.\n* **હાયર સ્ટડીઝ (D2D)**: ડિપ્લોમા પછી સીધા બીજા વર્ષની ડિગ્રી એન્જિનિયરિંગ (LDCE, VGEC, GEC) માં પ્રવેશ માટે શ્રેષ્ઠ પ્લેટફોર્મ.`;
+        }
+        if (currentLang === 'hi') {
+          return `**कंप्यूटर इंजीनियरिंग विभाग (KDPC पाटण)**\n\n* **कंप्यूटर लैब्स**: आधुनिक हाई-स्पीड इंटरनेट युक्त प्रोग्रामिंग (Python, C/C++, Web Development) लैब्स।\n* **पाठ्यक्रम**: GTU का इंडस्ट्री-ओरिएंटेड डिप्लोमा इंजीनियरिंग सिलेबस।\n* **उच्च शिक्षा (D2D)**: डिप्लोमा के बाद सीधे डिग्री इंजीनियरिंग सेकंड ईयर (LDCE, VGEC) में प्रवेश के लिए मजबूत मार्गदर्शन।`;
+        }
+        return `**Computer Engineering Department Overview**\n\n* **Labs & Infrastructure**: High-speed internet connected labs equipped for Python, Web Development, and Database systems.\n* **Faculty & Curriculum**: GTU-aligned diploma curriculum taught by experienced government lecturers.\n* **D2D Pathways**: Strong direct-to-degree admission guidance into premier engineering institutions.`;
       }
-      if (q.includes('seat') || q.includes('quota') || q.includes('tfw')) {
-        return `**Government Quota & Seat Matrix**\n\n* **Type**: 100% Government Quota administered by ACPDC Gujarat.\n* **Affiliation**: GTU (Gujarat Technological University) & Approved by AICTE.\n* **Categories**: Open, SEBC/OBC, SC, ST, EWS quota seats.\n* **TFW Scheme**: Tuition Fee Waiver (TFW) supernumerary seats available for high-merit students with family income under prescribed limit.`;
+
+      if (q.includes('contact') || q.includes('address') || q.includes('સંપર્ક') || q.includes('સરનામું') || q.includes('संपर्क')) {
+        return `**K.D. Polytechnic Patan Official Address**\n\n* **Name**: Kilachand Devchand Polytechnic (KDPC Patan)\n* **Address / Location**: Near HNGU University Highway, Patan - 384265, Gujarat.\n* **Category**: Government Polytechnic Institute\n* **Working Hours**: 10:30 AM to 5:00 PM (Monday to Saturday, 2nd & 4th Sat off).`;
       }
-      if (q.includes('contact') || q.includes('address') || q.includes('phone') || q.includes('email')) {
-        return `**K.D. Polytechnic Patan Contact Details**\n\n* **Institution**: Kilachand Devchand Polytechnic (KDPC)\n* **Address**: Near Hemchandracharya North Gujarat University (HNGU) Highway, Patan - 384265, Gujarat.\n* **Category**: Government Polytechnic College\n* **Admissions Help**: ACPDC Official Portal & College Admission Desk counter during working hours (10:30 AM to 5:00 PM).`;
-      }
-      return `**K.D. Polytechnic Patan Admission Assistant**\n\nReceived your inquiry: "${query}"\n\nYou can ask about cut-offs, Computer Engineering seat availability, document lists, or ACPDC registration steps!`;
     }
 
     if (mode === 'student_assistant') {
-      if (q.includes('form') || q.includes('scholarship') || q.includes('digital gujarat')) {
-        return `**Online Form Filling Assistance**\n\n* **Digital Gujarat Scholarship**: Requires Income Certificate, Caste Certificate, Bank Passbook (Aadhaar linked), College Fee Receipt, and Bonafide.\n* **GTU Exam Form**: Login to \`student.gtu.ac.in\`, verify pending subjects, pay examination fees, and download receipt.\n* **ACPDC Correction**: Guidance on category changes, income renewal, and grievance submission.`;
+      if (q.includes('scholarship') || q.includes('digital gujarat') || q.includes('સ્કોલરશિપ') || q.includes('स्कॉलरशिप')) {
+        if (currentLang === 'gu') {
+          return `**ડિજિટલ ગુજરાત સ્કોલરશિપ ફોર્મ માર્ગદર્શન**\n\n* **જરૂરી આધાર પુરાવા**: આવકનો દાખલો, જાતિનો દાખલો, બેંક પાસબુક (આધાર લિંક), કોલેજ ફી ની પહોંચ, અને બોનાફાઇડ સર્ટિફિકેટ.\n* **પોર્ટલ**: \`digitalgujarat.gov.in\`\n* **સ્ટેપ**: પોર્ટલ પર લોગીન કરો > Scholarship Services પસંદ કરો > યોગ્ય સ્કીમ સિલેક્ટ કરી ડોક્યુમેન્ટ અપલોડ કરો.`;
+        }
+        if (currentLang === 'hi') {
+          return `**डिजिटल गुजरात स्कॉलरशिप ऑनलाइन फॉर्म**\n\n* **आवश्यक दस्तावेज**: आय प्रमाण पत्र, जाति प्रमाण पत्र, बैंक पासबुक (आधार लिंक), कॉलेज फीस रसीद और बोनाफाइड सर्टिफिकेट।\n* **वेबसाइट**: \`digitalgujarat.gov.in\`\n* **प्रक्रिया**: पोर्टल पर नया आवेदन खोलें, बैंक डिटेल्स सत्यापित करें और डॉक्यूमेंट्स अपलोड करें।`;
+        }
+        return `**Digital Gujarat Scholarship Assistance**\n\n* **Required Documents**: Income certificate, Caste certificate, Bank passbook (Aadhaar seeded), College fee receipt, and Bonafide.\n* **Portal**: \`digitalgujarat.gov.in\`.`;
       }
-      return `**CampusAI Student Support**\n\nHere are step-by-step instructions for: "${query}". Upload any application form screenshot or PDF if you need live error-checking.`;
     }
 
-    return `Processed query: "${query}" via ${modeDetails[mode].name}.`;
+    return `Query received: "${query}" | Processed in ${langNames[currentLang].label} mode.`;
   };
 
   const handleSend = (overrideText?: string) => {
@@ -180,17 +209,17 @@ export default function ChatDashboard() {
     setLoading(true);
 
     setTimeout(() => {
-      const reply = generateSpecializedResponse(textToSend, selectedMode);
+      const reply = generateSpecializedResponse(textToSend, selectedMode, lang);
       setMessages((prev) => [
         ...prev, 
         { 
           role: 'assistant', 
           content: reply,
-          usedModel: modeDetails[selectedMode].name
+          usedModel: `${modeDetails[selectedMode].name} (${langNames[lang].native})`
         }
       ]);
       setLoading(false);
-    }, 700);
+    }, 600);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -293,7 +322,7 @@ export default function ChatDashboard() {
 
       {/* Main Workspace */}
       <main className="flex-1 flex flex-col h-full relative bg-[#0e0e11] overflow-hidden">
-        {/* Header with Mode Selector */}
+        {/* Header with Mode & Language Selector */}
         <header className="h-14 border-b border-zinc-800/60 px-4 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-2">
             {!isSidebarOpen && (
@@ -305,7 +334,7 @@ export default function ChatDashboard() {
               </button>
             )}
 
-            {/* Dropdown */}
+            {/* Mode Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
                 type="button"
@@ -347,6 +376,39 @@ export default function ChatDashboard() {
               )}
             </div>
           </div>
+
+          {/* Language Switcher Dropdown */}
+          <div className="relative" ref={langDropdownRef}>
+            <button
+              type="button"
+              onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
+              className="flex items-center gap-1.5 bg-[#17171c] hover:bg-[#1f1f26] border border-zinc-700 px-3 py-1.5 rounded-full text-xs font-medium text-zinc-200 transition cursor-pointer"
+            >
+              <Languages className="w-3.5 h-3.5 text-indigo-400" />
+              <span>{langNames[lang].label}</span>
+              <ChevronDown className={`w-3 h-3 text-zinc-400 transition-transform ${isLangDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {isLangDropdownOpen && (
+              <div className="absolute top-9 right-0 w-36 bg-[#18181d] border border-zinc-700/80 rounded-xl shadow-2xl p-1 flex flex-col gap-0.5 z-50">
+                {(['en', 'gu', 'hi'] as Language[]).map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => {
+                      setLang(l);
+                      setIsLangDropdownOpen(false);
+                    }}
+                    className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition cursor-pointer ${
+                      lang === l ? 'bg-zinc-800 text-white font-semibold' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40'
+                    }`}
+                  >
+                    <span>{langNames[l].label}</span>
+                    <span className="text-[10px] text-zinc-400">{langNames[l].native}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </header>
 
         {/* Message Feed */}
@@ -355,39 +417,39 @@ export default function ChatDashboard() {
           {selectedMode === 'admission_kd' && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
               <button 
-                onClick={() => handleSend('Tell me step-by-step ACPDC admission process for KD Polytechnic')}
+                onClick={() => handleSend(lang === 'gu' ? 'કે.ડી. પોલિટેકનિક પાટણની એડમિશન પ્રક્રિયા જણાવો' : lang === 'hi' ? 'केडी पॉलिटेक्निक की एडमिशन प्रक्रिया बताएं' : 'Tell me step-by-step ACPDC admission process for KD Polytechnic')}
                 className="p-2.5 rounded-xl border border-zinc-800 bg-[#16161b] hover:border-zinc-700 text-left text-xs transition cursor-pointer"
               >
                 <Layers className="w-3.5 h-3.5 text-indigo-400 mb-1" />
-                <div className="font-medium text-zinc-200">ACPDC Process</div>
-                <div className="text-[10px] text-zinc-400">Step-by-step steps</div>
+                <div className="font-medium text-zinc-200">{lang === 'gu' ? 'એડમિશન પ્રક્રિયા' : lang === 'hi' ? 'एडमिशन प्रक्रिया' : 'ACPDC Process'}</div>
+                <div className="text-[10px] text-zinc-400">{lang === 'gu' ? 'સ્ટેપ-બાય-સ્ટેપ' : lang === 'hi' ? 'स्टेप्स गाइड' : 'Step-by-step steps'}</div>
               </button>
 
               <button 
-                onClick={() => handleSend('Tell me about Computer Engineering department labs and faculty')}
+                onClick={() => handleSend(lang === 'gu' ? 'કમ્પ્યુટર એન્જિનિયરિંગ ડિપાર્ટમેન્ટ અને લેબ્સ વિશે જણાવો' : lang === 'hi' ? 'कंप्यूटर इंजीनियरिंग लैब्स और फैकल्टी की जानकारी दें' : 'Tell me about Computer Engineering department labs and faculty')}
                 className="p-2.5 rounded-xl border border-zinc-800 bg-[#16161b] hover:border-zinc-700 text-left text-xs transition cursor-pointer"
               >
                 <Building2 className="w-3.5 h-3.5 text-sky-400 mb-1" />
-                <div className="font-medium text-zinc-200">CE Department</div>
-                <div className="text-[10px] text-zinc-400">Labs & faculty</div>
+                <div className="font-medium text-zinc-200">{lang === 'gu' ? 'કમ્પ્યુટર ડિપાર્ટમેન્ટ' : lang === 'hi' ? 'कंप्यूटर विभाग' : 'CE Department'}</div>
+                <div className="text-[10px] text-zinc-400">{lang === 'gu' ? 'લેબ્સ અને ફેકલ્ટી' : lang === 'hi' ? 'लैब्स व फैकल्टी' : 'Labs & faculty'}</div>
               </button>
 
               <button 
-                onClick={() => handleSend('What are the government quota seats, categories and TFW scheme?')}
+                onClick={() => handleSend(lang === 'gu' ? 'સરકારી ક્વોટા અને TFW સીટો વિશે માહિતી આપો' : lang === 'hi' ? 'सरकारी कोटा और TFW सीट की जानकारी दें' : 'What are the government quota seats and TFW scheme?')}
                 className="p-2.5 rounded-xl border border-zinc-800 bg-[#16161b] hover:border-zinc-700 text-left text-xs transition cursor-pointer"
               >
                 <BookOpen className="w-3.5 h-3.5 text-emerald-400 mb-1" />
-                <div className="font-medium text-zinc-200">Quota & Seats</div>
-                <div className="text-[10px] text-zinc-400">Govt & TFW seats</div>
+                <div className="font-medium text-zinc-200">{lang === 'gu' ? 'ક્વોટા અને સીટો' : lang === 'hi' ? 'कोटा व सीटें' : 'Quota & Seats'}</div>
+                <div className="text-[10px] text-zinc-400">{lang === 'gu' ? 'Govt & TFW' : lang === 'hi' ? 'Govt & TFW' : 'Govt & TFW seats'}</div>
               </button>
 
               <button 
-                onClick={() => handleSend('Give me KD Polytechnic Patan contact details and address')}
+                onClick={() => handleSend(lang === 'gu' ? 'કે.ડી. પોલિટેકનિક પાટણનું સરનામું અને સંપર્ક નંબર આપો' : lang === 'hi' ? 'केडी पॉलिटेक्निक पाटण का संपर्क विवरण दें' : 'Give me KD Polytechnic Patan contact details and address')}
                 className="p-2.5 rounded-xl border border-zinc-800 bg-[#16161b] hover:border-zinc-700 text-left text-xs transition cursor-pointer"
               >
                 <Phone className="w-3.5 h-3.5 text-amber-400 mb-1" />
-                <div className="font-medium text-zinc-200">Contact & Info</div>
-                <div className="text-[10px] text-zinc-400">Campus address</div>
+                <div className="font-medium text-zinc-200">{lang === 'gu' ? 'સંપર્ક અને માહિતી' : lang === 'hi' ? 'संपर्क सूत्र' : 'Contact & Info'}</div>
+                <div className="text-[10px] text-zinc-400">{lang === 'gu' ? 'કેમ્પસ સરનામું' : lang === 'hi' ? 'कैंपस एड्रेस' : 'Campus address'}</div>
               </button>
             </div>
           )}
@@ -395,30 +457,30 @@ export default function ChatDashboard() {
           {selectedMode === 'student_assistant' && (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
               <button 
-                onClick={() => handleSend('Guide me step-by-step for Digital Gujarat Scholarship online form')}
+                onClick={() => handleSend(lang === 'gu' ? 'ડિજિટલ ગુજરાત સ્કોલરશિપ ફોર્મ ભરવા માટે માર્ગદર્શન આપો' : lang === 'hi' ? 'डिजिटल गुजरात स्कॉलरशिप फॉर्म भरने की जानकारी दें' : 'Guide me step-by-step for Digital Gujarat Scholarship online form')}
                 className="p-2.5 rounded-xl border border-zinc-800 bg-[#16161b] hover:border-zinc-700 text-left text-xs transition cursor-pointer"
               >
                 <FileText className="w-3.5 h-3.5 text-emerald-400 mb-1" />
-                <div className="font-medium text-zinc-200">Scholarship Forms</div>
+                <div className="font-medium text-zinc-200">{lang === 'gu' ? 'સ્કોલરશિપ ફોર્મ' : lang === 'hi' ? 'स्कॉलरशिप फॉर्म' : 'Scholarship Forms'}</div>
                 <div className="text-[10px] text-zinc-400">Digital Gujarat portal</div>
               </button>
 
               <button 
-                onClick={() => handleSend('What is the required document checklist for admission and exam forms?')}
+                onClick={() => handleSend(lang === 'gu' ? 'એડમિશન અને સ્કોલરશિપ માટે જરૂરી ડોક્યુમેન્ટ્સનું લિસ્ટ આપો' : lang === 'hi' ? 'एडमिशन के लिए जरूरी डॉक्यूमेंट की लिस्ट बताएं' : 'What is the required document checklist for admission and exam forms?')}
                 className="p-2.5 rounded-xl border border-zinc-800 bg-[#16161b] hover:border-zinc-700 text-left text-xs transition cursor-pointer"
               >
                 <Layers className="w-3.5 h-3.5 text-indigo-400 mb-1" />
-                <div className="font-medium text-zinc-200">Document Checklist</div>
-                <div className="text-[10px] text-zinc-400">Income & Caste verification</div>
+                <div className="font-medium text-zinc-200">{lang === 'gu' ? 'જરૂરી ડોક્યુમેન્ટ્સ' : lang === 'hi' ? 'दस्तावेज़ सूची' : 'Document Checklist'}</div>
+                <div className="text-[10px] text-zinc-400">Income & Caste verify</div>
               </button>
 
               <button 
-                onClick={() => handleSend('Where can I get GTU diploma computer engineering syllabus and papers?')}
+                onClick={() => handleSend(lang === 'gu' ? 'GTU કમ્પ્યુટર એન્જિનિયરિંગ સિલેબસ અને પેપર્સ ક્યાં મળશે?' : lang === 'hi' ? 'GTU कंप्यूटर इंजीनियरिंग का सिलेबस कहां मिलेगा?' : 'Where can I get GTU diploma computer engineering syllabus and papers?')}
                 className="p-2.5 rounded-xl border border-zinc-800 bg-[#16161b] hover:border-zinc-700 text-left text-xs transition cursor-pointer"
               >
                 <BookOpen className="w-3.5 h-3.5 text-sky-400 mb-1" />
-                <div className="font-medium text-zinc-200">GTU Resources</div>
-                <div className="text-[10px] text-zinc-400">Syllabus & question banks</div>
+                <div className="font-medium text-zinc-200">{lang === 'gu' ? 'GTU સિલેબસ' : lang === 'hi' ? 'GTU रिसोर्सेज' : 'GTU Resources'}</div>
+                <div className="text-[10px] text-zinc-400">Syllabus & papers</div>
               </button>
             </div>
           )}
@@ -462,7 +524,9 @@ export default function ChatDashboard() {
           {loading && (
             <div className="flex items-center gap-2 text-zinc-400 text-xs py-2">
               <Loader2 className="w-3.5 h-3.5 animate-spin text-zinc-400" />
-              <span>Fetching college info & verifying steps...</span>
+              <span>
+                {lang === 'gu' ? 'માહિતી લાવી રહ્યા છીએ...' : lang === 'hi' ? 'जानकारी प्रोसेस हो रही है...' : 'Fetching college info & verifying steps...'}
+              </span>
             </div>
           )}
         </div>
@@ -493,10 +557,10 @@ export default function ChatDashboard() {
               onKeyDown={handleKeyDown}
               placeholder={
                 selectedMode === 'admission_kd'
-                  ? 'Ask about KD Polytechnic Patan admissions, cutoffs, CE branch...'
+                  ? (lang === 'gu' ? 'કે.ડી. પોલિટેકનિક પાટણ એડમિશન, કટઓફ અને CE સીટો વિશે પૂછો...' : lang === 'hi' ? 'केडी पॉलिटेक्निक पाटण एडमिशन, कटऑफ और CE ब्रांच के बारे में पूछें...' : 'Ask about KD Polytechnic Patan admissions, cutoffs, CE branch...')
                   : selectedMode === 'student_assistant'
-                  ? 'Ask about scholarship online forms, document checklist, GTU portal...'
-                  : `Message ${modeDetails[selectedMode].name}...`
+                  ? (lang === 'gu' ? 'સ્કોલરશિપ ફોર્મ, ડોક્યુમેન્ટ લિસ્ટ, GTU પોર્ટલ વિશે પૂછો...' : lang === 'hi' ? 'स्कॉलरशिप फॉर्म, डॉक्यूमेंट लिस्ट, GTU पोर्टल के बारे में पूछें...' : 'Ask about scholarship online forms, document checklist, GTU portal...')
+                  : (lang === 'gu' ? 'કોઈપણ પ્રશ્ન પૂછો...' : lang === 'hi' ? 'कोई भी प्रश्न पूछें...' : `Message ${modeDetails[selectedMode].name}...`)
               }
               className="w-full bg-transparent px-2 text-sm text-zinc-100 placeholder-zinc-400 focus:outline-none resize-none min-h-[24px] max-h-[180px] leading-relaxed"
             />
@@ -533,7 +597,7 @@ export default function ChatDashboard() {
           </div>
 
           <p className="text-[11px] text-center text-zinc-400 mt-2">
-            CampusAI • Official KD Polytechnic Patan & GTU Student Assistant Desk
+            CampusAI • K.D. Polytechnic Patan & GTU Multilingual Assistant (EN / ગુજ / हिं)
           </p>
         </div>
       </main>
