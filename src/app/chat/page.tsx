@@ -2,8 +2,9 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  Bot, Send, Sparkles, MessageSquare, Plus, 
-  Trash2, Zap, Brain, LogOut, ChevronDown, Check, Wand2
+  Send, Sparkles, MessageSquare, Plus, 
+  Trash2, Zap, Brain, LogOut, ChevronDown, Check, Wand2,
+  PanelLeftClose, PanelLeft, ArrowUp, Paperclip, Copy
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -19,47 +20,44 @@ export default function ChatDashboard() {
   const [messages, setMessages] = useState<Message[]>([
     { 
       role: 'assistant', 
-      content: 'Hello! I am your CampusAI academic copilot. Select a model or use Auto Mode to let me choose the best AI for your query!' 
+      content: 'What can I help you with today?',
     }
   ]);
   const [input, setInput] = useState('');
   const [selectedModel, setSelectedModel] = useState<Model>('auto');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const modelDetails = {
     auto: { 
-      name: 'Auto Mode', 
-      desc: 'Intelligently routes to the best model', 
-      tag: 'Smart Routing', 
-      icon: Wand2, 
-      color: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10' 
+      name: 'Auto Router', 
+      desc: 'Dynamic classifier (Speed, Code, Reasoning)', 
+      badge: 'Smart',
+      icon: Wand2 
     },
     gemini: { 
       name: 'Gemini 1.5 Pro', 
-      desc: 'Academic analysis & fast explanations', 
-      tag: 'Fast & Versatile', 
-      icon: Sparkles, 
-      color: 'text-sky-400 border-sky-500/30 bg-sky-500/10' 
+      desc: 'Multimodal research, synthesis & academics', 
+      badge: 'Google',
+      icon: Sparkles 
     },
     deepseek: { 
       name: 'DeepSeek R1', 
-      desc: 'Complex math, coding & deep reasoning', 
-      tag: 'Reasoning & Code', 
-      icon: Brain, 
-      color: 'text-indigo-400 border-indigo-500/30 bg-indigo-500/10' 
+      desc: 'Mathematical rigor & algorithmic code', 
+      badge: 'Reasoning',
+      icon: Brain 
     },
     grok: { 
-      name: 'Grok Beta', 
-      desc: 'Direct, witty & concise insights', 
-      tag: 'Direct & Realtime', 
-      icon: Zap, 
-      color: 'text-amber-400 border-amber-500/30 bg-amber-500/10' 
+      name: 'Grok 2', 
+      desc: 'Direct, unfiltered & real-time insights', 
+      badge: 'xAI',
+      icon: Zap 
     }
   };
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -70,28 +68,24 @@ export default function ChatDashboard() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Smart Model Classifier for Auto Mode
   const detectBestModel = (query: string): 'gemini' | 'deepseek' | 'grok' => {
     const q = query.toLowerCase();
-    const codeKeywords = ['code', 'python', 'java', 'c++', 'bug', 'function', 'algorithm', 'sql', 'dsa', 'react', 'api'];
-    const mathKeywords = ['solve', 'calculate', 'derivative', 'integral', 'matrix', 'physics', 'math'];
-    const conciseKeywords = ['summarize', 'bullet', 'brief', 'short', 'quick', 'define'];
+    const codeMath = ['code', 'python', 'java', 'c++', 'bug', 'function', 'sql', 'solve', 'calculate', 'matrix', 'integral'];
+    const concise = ['summarize', 'brief', 'short', 'explain fast', 'quick'];
 
-    if (codeKeywords.some(k => q.includes(k)) || mathKeywords.some(k => q.includes(k))) {
-      return 'deepseek';
-    }
-    if (conciseKeywords.some(k => q.includes(k))) {
-      return 'grok';
-    }
+    if (codeMath.some(k => q.includes(k))) return 'deepseek';
+    if (concise.some(k => q.includes(k))) return 'grok';
     return 'gemini';
   };
 
-  const handleSend = async (e: React.FormEvent) => {
+  const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || loading) return;
 
-    const userText = input;
+    const userText = input.trim();
     setInput('');
+    if (textareaRef.current) textareaRef.current.style.height = 'auto';
+
     setMessages(prev => [...prev, { role: 'user', content: userText }]);
     setLoading(true);
 
@@ -103,12 +97,12 @@ export default function ChatDashboard() {
         ...prev, 
         { 
           role: 'assistant', 
-          content: `Analyzed query: "${userText}". Ready for backend API integration!`,
-          usedModel: selectedModel === 'auto' ? `Auto-routed to ${modelMeta.name}` : modelMeta.name
+          content: `Here is the structured breakdown for your query:\n\n1. **Core Concept**: Analyzing "${userText}"\n2. **Optimization**: Model routing applied cleanly.\n3. **Result**: Backend endpoint connection is ready for execution.`,
+          usedModel: selectedModel === 'auto' ? `Auto: ${modelMeta.name}` : modelMeta.name
         }
       ]);
       setLoading(false);
-    }, 1000);
+    }, 900);
   };
 
   const handleLogout = async () => {
@@ -119,177 +113,171 @@ export default function ChatDashboard() {
   const ActiveIcon = modelDetails[selectedModel].icon;
 
   return (
-    <div className="flex h-screen w-full bg-slate-950 text-slate-100 font-sans overflow-hidden">
-      {/* Sidebar */}
-      <aside className="w-64 border-r border-slate-800 bg-slate-900/50 flex flex-col justify-between hidden md:flex">
-        <div className="p-4 flex flex-col gap-4">
-          <div className="flex items-center gap-2.5 px-2">
-            <Bot className="h-6 w-6 text-indigo-400" />
-            <span className="font-bold text-lg tracking-tight text-white">CampusAI</span>
+    <div className="flex h-screen w-full bg-[#0e0e11] text-[#ececed] font-sans antialiased selection:bg-zinc-700 selection:text-white">
+      {/* Sleek Minimalist Sidebar (Grok/Gemini Style) */}
+      <aside className={`${isSidebarOpen ? 'w-64' : 'w-0'} transition-all duration-200 border-r border-zinc-800/80 bg-[#131316] flex flex-col justify-between overflow-hidden`}>
+        <div className="p-3 flex flex-col gap-3 min-w-[16rem]">
+          <div className="flex items-center justify-between px-2 pt-1">
+            <span className="font-semibold text-sm tracking-wide text-zinc-100 flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 ring-4 ring-emerald-500/20" />
+              CampusAI
+            </span>
+            <button 
+              onClick={() => setIsSidebarOpen(false)}
+              className="p-1.5 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-zinc-200 transition cursor-pointer"
+            >
+              <PanelLeftClose className="w-4 h-4" />
+            </button>
           </div>
 
-          <button className="flex items-center gap-2 w-full py-2.5 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition cursor-pointer">
-            <Plus className="w-4 h-4" />
-            <span>New Chat</span>
+          <button className="flex items-center gap-2 w-full py-2 px-3 rounded-lg border border-zinc-750 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-200 text-xs font-medium transition cursor-pointer shadow-sm">
+            <Plus className="w-3.5 h-3.5 text-zinc-400" />
+            <span>New thread</span>
           </button>
 
-          <div className="mt-2 text-xs font-semibold text-slate-400 px-2 tracking-wider uppercase">
-            Recent Chats
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <button className="flex items-center justify-between text-left text-sm text-slate-300 hover:bg-slate-800/60 px-3 py-2 rounded-lg group transition">
-              <span className="truncate flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-slate-500 group-hover:text-indigo-400" />
-                DSA Recursion & Trees
-              </span>
+          <div className="mt-3 flex flex-col gap-0.5">
+            <div className="text-[11px] font-medium text-zinc-400 px-2 py-1">Recent</div>
+            <button className="flex items-center gap-2.5 text-left text-xs text-zinc-300 hover:bg-zinc-800/60 px-2.5 py-2 rounded-lg group transition cursor-pointer">
+              <MessageSquare className="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-300" />
+              <span className="truncate">Computer Networks Subnetting</span>
             </button>
-            <button className="flex items-center justify-between text-left text-sm text-slate-300 hover:bg-slate-800/60 px-3 py-2 rounded-lg group transition">
-              <span className="truncate flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-slate-500 group-hover:text-indigo-400" />
-                DBMS Normalization
-              </span>
+            <button className="flex items-center gap-2.5 text-left text-xs text-zinc-300 hover:bg-zinc-800/60 px-2.5 py-2 rounded-lg group transition cursor-pointer">
+              <MessageSquare className="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-300" />
+              <span className="truncate">Quick Sort Algorithm Logic</span>
             </button>
           </div>
         </div>
 
-        <div className="p-4 border-t border-slate-800">
+        <div className="p-3 border-t border-zinc-800/60 min-w-[16rem]">
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-2 text-sm text-rose-400 hover:text-rose-300 w-full px-2 py-1.5 transition cursor-pointer"
+            className="flex items-center gap-2 text-xs text-zinc-400 hover:text-zinc-200 w-full px-2 py-2 rounded-lg hover:bg-zinc-800/50 transition cursor-pointer"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>
           </button>
         </div>
       </aside>
 
-      {/* Main Chat Workspace */}
-      <main className="flex-1 flex flex-col h-full relative">
-        {/* Top Navbar with Dropdown */}
-        <header className="h-16 border-b border-slate-800 px-6 flex items-center justify-between bg-slate-900/30 backdrop-blur-md relative z-30">
-          {/* Dropdown Selector */}
-          <div className="relative" ref={dropdownRef}>
-            <button
-              type="button"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-3 bg-slate-900/90 hover:bg-slate-800/90 border border-slate-700/80 px-3.5 py-2 rounded-xl text-sm font-medium transition cursor-pointer shadow-lg shadow-black/20"
-            >
-              <div className={`p-1 rounded-lg ${modelDetails[selectedModel].color.split(' ')[2]}`}>
-                <ActiveIcon className={`w-4 h-4 ${modelDetails[selectedModel].color.split(' ')[0]}`} />
-              </div>
-              <span className="text-white font-semibold">{modelDetails[selectedModel].name}</span>
-              <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-            </button>
-
-            {/* Dropdown List */}
-            {isDropdownOpen && (
-              <div className="absolute top-12 left-0 w-72 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-2 flex flex-col gap-1 backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-150">
-                {(['auto', 'gemini', 'deepseek', 'grok'] as Model[]).map((m) => {
-                  const item = modelDetails[m];
-                  const Icon = item.icon;
-                  const isSelected = selectedModel === m;
-
-                  return (
-                    <button
-                      key={m}
-                      onClick={() => {
-                        setSelectedModel(m);
-                        setIsDropdownOpen(false);
-                      }}
-                      className={`flex items-start gap-3 p-2.5 rounded-xl transition text-left cursor-pointer ${
-                        isSelected ? 'bg-indigo-600/15 border border-indigo-500/30' : 'hover:bg-slate-800/60'
-                      }`}
-                    >
-                      <div className={`p-1.5 rounded-lg mt-0.5 ${item.color.split(' ')[2]}`}>
-                        <Icon className={`w-4 h-4 ${item.color.split(' ')[0]}`} />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-semibold text-white">{item.name}</span>
-                          {isSelected && <Check className="w-3.5 h-3.5 text-indigo-400" />}
-                        </div>
-                        <p className="text-[11px] text-slate-400 mt-0.5 leading-tight">{item.desc}</p>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+      {/* Main Conversation Container */}
+      <main className="flex-1 flex flex-col h-full relative bg-[#0e0e11]">
+        {/* Top Header */}
+        <header className="h-14 border-b border-zinc-800/60 px-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {!isSidebarOpen && (
+              <button 
+                onClick={() => setIsSidebarOpen(true)}
+                className="p-1.5 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-zinc-200 transition cursor-pointer mr-1"
+              >
+                <PanelLeft className="w-4 h-4" />
+              </button>
             )}
-          </div>
 
-          <div className={`hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-medium ${modelDetails[selectedModel].color}`}>
-            <ActiveIcon className="w-3.5 h-3.5" />
-            <span>{modelDetails[selectedModel].tag}</span>
+            {/* Model Pill Dropdown */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="flex items-center gap-2 bg-[#17171c] hover:bg-[#1f1f26] border border-zinc-750 px-3 py-1.5 rounded-full text-xs font-medium transition cursor-pointer"
+              >
+                <ActiveIcon className="w-3.5 h-3.5 text-zinc-300" />
+                <span className="text-zinc-200">{modelDetails[selectedModel].name}</span>
+                <ChevronDown className={`w-3 h-3 text-zinc-400 transition-transform duration-150 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isDropdownOpen && (
+                <div className="absolute top-9 left-0 w-64 bg-[#18181d] border border-zinc-700/80 rounded-xl shadow-2xl p-1.5 flex flex-col gap-0.5 z-50">
+                  {(['auto', 'gemini', 'deepseek', 'grok'] as Model[]).map((m) => {
+                    const item = modelDetails[m];
+                    const Icon = item.icon;
+                    const isSelected = selectedModel === m;
+
+                    return (
+                      <button
+                        key={m}
+                        onClick={() => {
+                          setSelectedModel(m);
+                          setIsDropdownOpen(false);
+                        }}
+                        className={`flex items-start gap-2.5 p-2 rounded-lg transition text-left cursor-pointer ${
+                          isSelected ? 'bg-zinc-800/90 text-white' : 'hover:bg-zinc-800/40 text-zinc-400 hover:text-zinc-200'
+                        }`}
+                      >
+                        <Icon className="w-4 h-4 mt-0.5 text-zinc-300 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-medium text-zinc-200">{item.name}</span>
+                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-zinc-700/60 text-zinc-300">{item.badge}</span>
+                          </div>
+                          <p className="text-[10px] text-zinc-400 truncate mt-0.5">{item.desc}</p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
-        {/* Messages Feed */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 max-w-4xl w-full mx-auto">
+        {/* Message Feed */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 max-w-3xl w-full mx-auto">
           {messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
-            >
-              <div className={`flex gap-3 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                {msg.role === 'assistant' && (
-                  <div className="h-8 w-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center flex-shrink-0 text-indigo-400">
-                    <Bot className="w-4 h-4" />
+            <div key={index} className="space-y-1.5">
+              {msg.role === 'user' ? (
+                <div className="flex justify-end">
+                  <div className="max-w-[80%] bg-[#212127] text-zinc-100 px-4 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap font-normal">
+                    {msg.content}
                   </div>
-                )}
-
-                <div
-                  className={`rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
-                    msg.role === 'user'
-                      ? 'bg-indigo-600 text-white rounded-br-none shadow-lg shadow-indigo-600/10'
-                      : 'bg-slate-900 border border-slate-800 text-slate-200 rounded-bl-none shadow-sm'
-                  }`}
-                >
-                  {msg.content}
                 </div>
-              </div>
-
-              {msg.usedModel && (
-                <span className="text-[10px] text-slate-500 mt-1.5 ml-11 flex items-center gap-1 font-mono">
-                  <Wand2 className="w-2.5 h-2.5 text-indigo-400" />
-                  {msg.usedModel}
-                </span>
+              ) : (
+                <div className="flex flex-col items-start gap-1">
+                  {msg.usedModel && (
+                    <span className="text-[10px] text-zinc-400 font-mono tracking-tight flex items-center gap-1 mb-1">
+                      <Sparkles className="w-3 h-3 text-zinc-400" />
+                      {msg.usedModel}
+                    </span>
+                  )}
+                  <div className="max-w-full text-zinc-200 text-[14px] leading-relaxed whitespace-pre-wrap pr-4">
+                    {msg.content}
+                  </div>
+                </div>
               )}
             </div>
           ))}
 
           {loading && (
-            <div className="flex gap-3 items-center text-slate-400 text-xs">
-              <div className="h-8 w-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center animate-pulse">
-                <Bot className="w-4 h-4 text-indigo-400" />
-              </div>
-              <span>Routing and computing response...</span>
+            <div className="flex items-center gap-2 text-zinc-400 text-xs py-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-zinc-400 animate-pulse" />
+              <span>Thinking...</span>
             </div>
           )}
         </div>
 
-        {/* Input Bar */}
-        <div className="p-4 border-t border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
-          <form onSubmit={handleSend} className="max-w-4xl mx-auto flex gap-2">
+        {/* Grok/Gemini Floating Pill Input */}
+        <div className="p-4 bg-transparent max-w-3xl w-full mx-auto">
+          <form 
+            onSubmit={handleSend}
+            className="relative flex items-center bg-[#17171c] border border-zinc-750 focus-within:border-zinc-500 rounded-2xl p-2 transition shadow-lg"
+          >
             <input
               type="text"
-              placeholder={
-                selectedModel === 'auto'
-                  ? 'Ask anything... Auto Mode will pick the right AI for code, math, or exams'
-                  : `Ask ${modelDetails[selectedModel].name}...`
-              }
+              placeholder={selectedModel === 'auto' ? 'Ask anything (Auto routes query)...' : `Message ${modelDetails[selectedModel].name}...`}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition"
+              className="flex-1 bg-transparent px-3 py-1.5 text-sm text-zinc-100 placeholder-zinc-400 focus:outline-none"
             />
             <button
               type="submit"
               disabled={loading || !input.trim()}
-              className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-5 rounded-xl flex items-center justify-center transition cursor-pointer"
+              className="h-8 w-8 rounded-xl bg-zinc-100 hover:bg-white disabled:bg-zinc-800 text-zinc-900 disabled:text-zinc-500 flex items-center justify-center transition cursor-pointer flex-shrink-0"
             >
-              <Send className="w-4 h-4" />
+              <ArrowUp className="w-4 h-4" />
             </button>
           </form>
+          <p className="text-[11px] text-center text-zinc-400 mt-2">
+            CampusAI can make mistakes. Verify critical academic formulas.
+          </p>
         </div>
       </main>
     </div>
