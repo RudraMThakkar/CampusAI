@@ -9,7 +9,7 @@ import {
   PanelLeftClose, PanelLeft, ArrowUp, 
   FileText, Image as ImageIcon, X, Loader2,
   GraduationCap, HelpCircle,
-  Languages
+  Languages, Copy, Check, Share2
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -29,7 +29,18 @@ interface Message {
   usedModel?: string;
 }
 
+interface ConversationItem {
+  id: string;
+  title: string;
+  mode: string;
+  created_at: string;
+}
+
 export default function ChatDashboard() {
+  const [userId, setUserId] = useState<string | null>(null);
+  const [conversations, setConversations] = useState<ConversationItem[]>([]);
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+
   const [selectedMode, setSelectedMode] = useState<ModeType>('auto');
   const [lang, setLang] = useState<Language>('en');
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
@@ -44,6 +55,8 @@ export default function ChatDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [loading, setLoading] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [sharedCopied, setSharedCopied] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const langDropdownRef = useRef<HTMLDivElement>(null);
@@ -55,16 +68,103 @@ export default function ChatDashboard() {
   const langNames: Record<Language, { label: string; native: string }> = {
     en: { label: 'English', native: 'EN' },
     gu: { label: 'ગુજરાતી', native: 'ગુજ' },
-    hi: { label: 'हिंदी', native: 'हिં' }
+    hi: { label: 'हिंदी', native: 'हिं' }
   };
 
   const modeDetails: Record<ModeType, { name: string; desc: string; badge: string; icon: React.ComponentType<{ className?: string }> }> = {
     auto: { name: 'Auto Router', desc: 'Dynamic model allocation', badge: 'Smart', icon: Wand2 },
+    gemini: { name: 'Gemini 2.0 Flash', desc: 'Ultra-fast multimodal Google engine', badge: 'Google', icon: Sparkles },
     deepseek: { name: 'OX Alpha / Code', desc: 'Advanced code & reasoning via OpenRouter', badge: 'OpenRouter', icon: Brain },
-    gemini: { name: 'Gemini 3.6 Flash', desc: 'Fast multimodal Google engine', badge: 'Google', icon: Sparkles },
     grok: { name: 'Grok Fast', desc: 'High-speed answers', badge: 'xAI', icon: Zap },
     admission_kd: { name: 'K.D. Polytechnic Admission', desc: 'ACPDC admission & CE branch', badge: 'Patan', icon: GraduationCap },
     student_assistant: { name: 'AI Student Services', desc: 'Scholarship & GTU exam portal', badge: 'Services', icon: HelpCircle }
+  };
+
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          setUserId(session.user.id);
+          fetchConversations(session.user.id);
+        }
+      } catch (e) {
+        console.error('Session retrieval error:', e);
+      }
+    };
+    initAuth();
+  }, []);
+
+  const fetchConversations = async (uid: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('conversations')
+        .select('id, title, mode, created_at')
+        .eq('user_id', uid)
+        .order('updated_at', { ascending: false });
+
+      if (!error && data) {
+        setConversations(data);
+      }
+    } catch (err) {
+      console.warn('Failed to load conversations from Supabase:', err);
+    }
+  };
+
+  const loadConversationMessages = async (convoId: string, convoMode?: string) => {
+    try {
+      setActiveConversationId(convoId);
+      if (convoMode && convoMode in modeDetails) {
+        setSelectedMode(convoMode as ModeType);
+      }
+
+      const { data, error } = await supabase
+        .from('messages')
+        .select('id, role, content, used_model')
+        .eq('conversation_id', convoId)
+        .order('created_at', { ascending: true });
+
+      if (!error && data && data.length > 0) {
+        setMessages(
+          data.map((m: any) => ({
+            role: m.role,
+            content: m.content,
+            usedModel: m.used_model,
+          }))
+        );
+      }
+    } catch (err) {
+      console.warn('Failed to load messages:', err);
+    }
+  };
+
+  const startNewChat = () => {
+    setActiveConversationId(null);
+    setMessages([
+      { 
+        role: 'assistant', 
+        content: 'What can I help you with today? You can ask code doubts, campus queries, or syllabus details.' 
+      }
+    ]);
+    setAttachedFiles([]);
+    setInput('');
+  };
+
+  const copyMessageContent = (text: string, index: number) => {
+    navigator.clipboard.writeText(text);
+    setCopiedIndex(index);
+    setTimeout(() => setCopiedIndex(null), 2000);
+  };
+
+  const handleShareChat = () => {
+    if (!activeConversationId) {
+      navigator.clipboard.writeText(window.location.href);
+    } else {
+      const shareUrl = `${window.location.origin}/chat?convoId=${activeConversationId}`;
+      navigator.clipboard.writeText(shareUrl);
+    }
+    setSharedCopied(true);
+    setTimeout(() => setSharedCopied(false), 2000);
   };
 
   useEffect(() => {
@@ -127,6 +227,29 @@ export default function ChatDashboard() {
     setLoading(true);
 
     try {
+      let currentConvoId = activeConversationId;
+
+      if (!currentConvoId && userId) {
+        const titleSnippet = textToSend.slice(0, 28) || 'New Query';
+        const { data: newConvo } = await supabase
+          .from('conversations')
+          .insert([{ user_id: userId, title: titleSnippet, mode: selectedMode }])
+          .select()
+          .single();
+
+        if (newConvo?.id) {
+          currentConvoId = newConvo.id;
+          setActiveConversationId(currentConvoId);
+          fetchConversations(userId);
+        }
+      }
+
+      if (currentConvoId) {
+        await supabase
+          .from('messages')
+          .insert([{ conversation_id: currentConvoId, role: 'user', content: textToSend }]);
+      }
+
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -138,18 +261,28 @@ export default function ChatDashboard() {
       });
 
       const data = await res.json();
-      if (data.reply) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant',
-            content: data.reply,
-            usedModel: data.usedModel || `${modeDetails[selectedMode].name}`,
-          },
-        ]);
-      } else {
-        throw new Error(data.error || 'Failed to get answer');
+
+      if (!res.ok || data.error) {
+        throw new Error(data.error || `HTTP ${res.status}`);
       }
+
+      const usedModelTitle = data.usedModel || `${modeDetails[selectedMode].name}`;
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: data.reply,
+          usedModel: usedModelTitle,
+        },
+      ]);
+
+      if (currentConvoId) {
+        await supabase
+          .from('messages')
+          .insert([{ conversation_id: currentConvoId, role: 'assistant', content: data.reply, used_model: usedModelTitle }]);
+      }
+
     } catch (err: any) {
       setMessages((prev) => [
         ...prev,
@@ -186,7 +319,7 @@ export default function ChatDashboard() {
     <div className="flex h-screen w-full bg-[#0c0c0e] text-[#ececed] font-sans antialiased">
       {/* Sidebar */}
       <aside className={`${isSidebarOpen ? 'w-64' : 'w-0'} transition-all duration-200 border-r border-zinc-800/80 bg-[#111114] flex flex-col justify-between overflow-hidden flex-shrink-0`}>
-        <div className="p-3 flex flex-col gap-3 min-w-[16rem]">
+        <div className="p-3 flex flex-col gap-3 min-w-[16rem] overflow-y-auto">
           <div className="flex items-center justify-between px-2 pt-1">
             <span className="font-semibold text-sm tracking-wide text-zinc-100 flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-emerald-500 ring-4 ring-emerald-500/20" />
@@ -201,11 +334,7 @@ export default function ChatDashboard() {
           </div>
 
           <button 
-            onClick={() => {
-              setMessages([{ role: 'assistant', content: 'What can I help you with today? You can ask code doubts, campus queries, or syllabus details.' }]);
-              setAttachedFiles([]);
-              setInput('');
-            }}
+            onClick={startNewChat}
             className="flex items-center gap-2 w-full py-2 px-3 rounded-lg border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-xs font-medium transition cursor-pointer shadow-sm"
           >
             <Plus className="w-3.5 h-3.5 text-zinc-400" />
@@ -236,15 +365,23 @@ export default function ChatDashboard() {
           </div>
 
           <div className="mt-2 flex flex-col gap-0.5">
-            <div className="text-[11px] font-medium text-zinc-400 px-2 py-1 uppercase tracking-wider">Recent</div>
-            <button className="flex items-center gap-2.5 text-left text-xs text-zinc-300 hover:bg-zinc-800/60 px-2.5 py-2 rounded-lg group transition cursor-pointer">
-              <MessageSquare className="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-300" />
-              <span className="truncate">Computer Networks Subnetting</span>
-            </button>
-            <button className="flex items-center gap-2.5 text-left text-xs text-zinc-300 hover:bg-zinc-800/60 px-2.5 py-2 rounded-lg group transition cursor-pointer">
-              <MessageSquare className="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-300" />
-              <span className="truncate">Quick Sort Algorithm Logic</span>
-            </button>
+            <div className="text-[11px] font-medium text-zinc-400 px-2 py-1 uppercase tracking-wider">Recent Conversations</div>
+            {conversations.length === 0 ? (
+              <p className="text-[11px] text-zinc-500 px-2 py-1 italic">No recent chats yet</p>
+            ) : (
+              conversations.map((convo) => (
+                <button 
+                  key={convo.id}
+                  onClick={() => loadConversationMessages(convo.id, convo.mode)}
+                  className={`flex items-center gap-2.5 text-left text-xs px-2.5 py-2 rounded-lg group transition cursor-pointer ${
+                    activeConversationId === convo.id ? 'bg-zinc-800 text-white font-medium border border-zinc-700/60' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
+                  }`}
+                >
+                  <MessageSquare className="w-3.5 h-3.5 flex-shrink-0 text-zinc-400 group-hover:text-zinc-300" />
+                  <span className="truncate">{convo.title}</span>
+                </button>
+              ))
+            )}
           </div>
         </div>
 
@@ -313,47 +450,59 @@ export default function ChatDashboard() {
             </div>
           </div>
 
-          <div className="relative" ref={langDropdownRef}>
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
+              onClick={handleShareChat}
               className="flex items-center gap-1.5 bg-[#151518] hover:bg-[#1e1e23] border border-zinc-700 px-3 py-1.5 rounded-full text-xs font-medium text-zinc-200 transition cursor-pointer"
+              title="Copy share link"
             >
-              <Languages className="w-3.5 h-3.5 text-indigo-400" />
-              <span>{langNames[lang].label}</span>
-              <ChevronDown className={`w-3 h-3 text-zinc-400 transition-transform ${isLangDropdownOpen ? 'rotate-180' : ''}`} />
+              {sharedCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5 text-zinc-400" />}
+              <span>{sharedCopied ? 'Link Copied' : 'Share'}</span>
             </button>
 
-            {isLangDropdownOpen && (
-              <div className="absolute top-9 right-0 w-36 bg-[#17171c] border border-zinc-700/80 rounded-xl shadow-2xl p-1 flex flex-col gap-0.5 z-50">
-                {(['en', 'gu', 'hi'] as Language[]).map((l) => (
-                  <button
-                    key={l}
-                    onClick={() => {
-                      setLang(l);
-                      setIsLangDropdownOpen(false);
-                    }}
-                    className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition cursor-pointer ${
-                      lang === l ? 'bg-zinc-800 text-white font-semibold' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40'
-                    }`}
-                  >
-                    <span>{langNames[l].label}</span>
-                    <span className="text-[10px] text-zinc-400">{langNames[l].native}</span>
-                  </button>
-                ))}
-              </div>
-            )}
+            <div className="relative" ref={langDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
+                className="flex items-center gap-1.5 bg-[#151518] hover:bg-[#1e1e23] border border-zinc-700 px-3 py-1.5 rounded-full text-xs font-medium text-zinc-200 transition cursor-pointer"
+              >
+                <Languages className="w-3.5 h-3.5 text-indigo-400" />
+                <span>{langNames[lang].label}</span>
+                <ChevronDown className={`w-3 h-3 text-zinc-400 transition-transform ${isLangDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isLangDropdownOpen && (
+                <div className="absolute top-9 right-0 w-36 bg-[#17171c] border border-zinc-700/80 rounded-xl shadow-2xl p-1 flex flex-col gap-0.5 z-50">
+                  {(['en', 'gu', 'hi'] as Language[]).map((l) => (
+                    <button
+                      key={l}
+                      onClick={() => {
+                        setLang(l);
+                        setIsLangDropdownOpen(false);
+                      }}
+                      className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition cursor-pointer ${
+                        lang === l ? 'bg-zinc-800 text-white font-semibold' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40'
+                      }`}
+                    >
+                      <span>{langNames[l].label}</span>
+                      <span className="text-[10px] text-zinc-400">{langNames[l].native}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
-        {/* Message Feed with Markdown Support */}
+        {/* Message Feed */}
         <div className="flex-1 relative overflow-hidden flex">
           <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 max-w-3xl w-full mx-auto scroll-smooth">
             {messages.map((msg, index) => (
               <div 
                 key={index} 
                 ref={(el) => { messageRefs.current[index] = el; }}
-                className="space-y-2 scroll-mt-6"
+                className="space-y-2 scroll-mt-6 group"
               >
                 {msg.role === 'user' ? (
                   <div className="flex flex-col items-end gap-1.5">
@@ -381,7 +530,7 @@ export default function ChatDashboard() {
                         {msg.usedModel}
                       </span>
                     )}
-                    <div className="max-w-full text-zinc-200 text-[14px] leading-relaxed pr-4 overflow-x-auto">
+                    <div className="max-w-full text-zinc-200 text-[14px] leading-relaxed pr-4 overflow-x-auto w-full">
                       <ReactMarkdown 
                         remarkPlugins={[remarkGfm]}
                         components={{
@@ -405,6 +554,27 @@ export default function ChatDashboard() {
                         {msg.content}
                       </ReactMarkdown>
                     </div>
+
+                    <div className="flex items-center gap-2 mt-1.5 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => copyMessageContent(msg.content, index)}
+                        className="flex items-center gap-1 text-[11px] text-zinc-400 hover:text-zinc-200 bg-zinc-900/60 hover:bg-zinc-800 border border-zinc-800 px-2 py-1 rounded-md transition cursor-pointer"
+                        title="Copy response text"
+                      >
+                        {copiedIndex === index ? (
+                          <>
+                            <Check className="w-3 h-3 text-emerald-400" />
+                            <span className="text-emerald-400">Copied</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" />
+                            <span>Copy</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -418,7 +588,6 @@ export default function ChatDashboard() {
             )}
           </div>
 
-          {/* Jump-To-Prompt Dots */}
           {userPromptIndices.length > 1 && (
             <div className="hidden md:flex flex-col items-center justify-center gap-2 pr-3 pl-1 py-4 z-20 select-none">
               <div className="bg-[#16161b]/80 backdrop-blur border border-zinc-800/80 rounded-full py-2 px-1 flex flex-col items-center gap-2 shadow-lg">
