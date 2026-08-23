@@ -1,13 +1,15 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { 
   Plus, Sparkles, MessageSquare, 
   Zap, Brain, LogOut, ChevronDown, Wand2,
   PanelLeftClose, PanelLeft, ArrowUp, 
   FileText, Image as ImageIcon, X, Loader2,
-  GraduationCap, HelpCircle, Building2, BookOpen, Phone, Layers,
-  Languages, ChevronUp, ChevronDown as ChevronDownIcon
+  GraduationCap, HelpCircle,
+  Languages
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -34,7 +36,7 @@ export default function ChatDashboard() {
   const [messages, setMessages] = useState<Message[]>([
     { 
       role: 'assistant', 
-      content: 'Welcome to CampusAI! Ask academic questions, or explore KD Polytechnic Patan admissions and GTU student services.' 
+      content: 'Welcome to CampusAI! Ask academic questions, explore KD Polytechnic Patan admissions, or access GTU student services.' 
     }
   ]);
   const [input, setInput] = useState('');
@@ -53,16 +55,16 @@ export default function ChatDashboard() {
   const langNames: Record<Language, { label: string; native: string }> = {
     en: { label: 'English', native: 'EN' },
     gu: { label: 'ગુજરાતી', native: 'ગુજ' },
-    hi: { label: 'हिंदी', native: 'हिं' }
+    hi: { label: 'हिंदी', native: 'हिં' }
   };
 
-  const modeDetails: Record<ModeType, { name: string; desc: string; badge: string; icon: any }> = {
-    auto: { name: 'Auto Router', desc: 'Dynamic classifier (Speed, Code, Reasoning)', badge: 'Smart', icon: Wand2 },
-    gemini: { name: 'Gemini 1.5 Pro', desc: 'Multimodal research & academics', badge: 'Google', icon: Sparkles },
-    deepseek: { name: 'DeepSeek R1', desc: 'Mathematical rigor & algorithmic code', badge: 'Reasoning', icon: Brain },
-    grok: { name: 'Grok 2', desc: 'Direct, unfiltered & real-time insights', badge: 'xAI', icon: Zap },
-    admission_kd: { name: 'K.D. Polytechnic Admission', desc: 'ACPDC admission, CE branch & seats', badge: 'Patan', icon: GraduationCap },
-    student_assistant: { name: 'AI Student Services', desc: 'Scholarship, GTU exam portal & study guides', badge: 'Services', icon: HelpCircle }
+  const modeDetails: Record<ModeType, { name: string; desc: string; badge: string; icon: React.ComponentType<{ className?: string }> }> = {
+    auto: { name: 'Auto Router', desc: 'Dynamic model allocation', badge: 'Smart', icon: Wand2 },
+    deepseek: { name: 'OX Alpha / Code', desc: 'Advanced code & reasoning via OpenRouter', badge: 'OpenRouter', icon: Brain },
+    gemini: { name: 'Gemini 3.6 Flash', desc: 'Fast multimodal Google engine', badge: 'Google', icon: Sparkles },
+    grok: { name: 'Grok Fast', desc: 'High-speed answers', badge: 'xAI', icon: Zap },
+    admission_kd: { name: 'K.D. Polytechnic Admission', desc: 'ACPDC admission & CE branch', badge: 'Patan', icon: GraduationCap },
+    student_assistant: { name: 'AI Student Services', desc: 'Scholarship & GTU exam portal', badge: 'Services', icon: HelpCircle }
   };
 
   useEffect(() => {
@@ -84,22 +86,6 @@ export default function ChatDashboard() {
   const handleModeSwitch = (mode: ModeType) => {
     setSelectedMode(mode);
     setIsDropdownOpen(false);
-
-    if (mode === 'admission_kd') {
-      const welcomeText = {
-        en: `**Welcome to K.D. Polytechnic Patan Admission Desk**\n\nI can guide you through:\n* **Step-by-Step ACPDC Admission Process**\n* **Computer Engineering (CE) Department** (Labs, Curriculum, Faculty)\n* **Government Quota Seats & Reservation** (OPEN, SEBC, SC, ST, EWS, TFW)\n* **Official Contact & Help Center**`,
-        gu: `**કે.ડી. પોલિટેકનિક પાટણ એડમિશન ડેસ્કમાં આપનું સ્વાગત છે**\n\nહું તમને નીચેની બાબતોમાં મદદ કરી શકું છું:\n* **ACPDC એડમિશન પ્રક્રિયા (Step-by-Step)**\n* **કમ્પ્યુટર એન્જિનિયરિંગ ડિપાર્ટમેન્ટ**\n* **સરકારી ક્વોટા અને સીટોની માહિતી**`,
-        hi: `**के.डी. पॉलिटेक्निक पाटण एडमिशन हेल्पडेस्क में आपका स्वागत है**\n\nमैं आपकी सहायता कर सकता हूँ:\n* **ACPDC एडमिशन प्रक्रिया**\n* **कंप्यूटर इंजीनियरिंग विभाग**\n* **सरकारी कोटा और सीट मैट्रिक्स**`
-      };
-      setMessages([{ role: 'assistant', content: welcomeText[lang] }]);
-    } else if (mode === 'student_assistant') {
-      const welcomeText = {
-        en: `**CampusAI Student Services Desk**\n\n* **Online Form Filling** (Digital Gujarat Scholarship, GTU Exam Form)\n* **Document Checklists** (Income certificate, Caste verification, LC)\n* **GTU Resources** (Syllabus, Question Banks, Lab Manuals)`,
-        gu: `**કેમ્પસ-AI વિદ્યાર્થી સેવા કેન્દ્ર**\n\n* **ઓનલાઇન ફોર્મ ભરવા માટે માર્ગદર્શન** (ડિજિટલ ગુજરાત સ્કોલરશિપ, GTU પરીક્ષા ફોર્મ)\n* **જરૂરી ડોક્યુમેન્ટ લિસ્ટ**`,
-        hi: `**कैंपस-AI छात्र सहायता केंद्र**\n\n* **ऑनलाइन फॉर्म भरने का मार्गदर्शन** (डिजिटल गुजरात स्कॉलरशिप, GTU परीक्षा फॉर्म)\n* **आवश्यक दस्तावेज सूची**`
-      };
-      setMessages([{ role: 'assistant', content: welcomeText[lang] }]);
-    }
   };
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -158,7 +144,7 @@ export default function ChatDashboard() {
           {
             role: 'assistant',
             content: data.reply,
-            usedModel: `${modeDetails[selectedMode].name} (${langNames[lang].native})`,
+            usedModel: data.usedModel || `${modeDetails[selectedMode].name}`,
           },
         ]);
       } else {
@@ -216,10 +202,9 @@ export default function ChatDashboard() {
 
           <button 
             onClick={() => {
-              setMessages([{ role: 'assistant', content: 'What can I help you with today? You can attach code files, syllabus PDFs, or admission queries.' }]);
+              setMessages([{ role: 'assistant', content: 'What can I help you with today? You can ask code doubts, campus queries, or syllabus details.' }]);
               setAttachedFiles([]);
               setInput('');
-              setSelectedMode('auto');
             }}
             className="flex items-center gap-2 w-full py-2 px-3 rounded-lg border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-xs font-medium transition cursor-pointer shadow-sm"
           >
@@ -361,7 +346,7 @@ export default function ChatDashboard() {
           </div>
         </header>
 
-        {/* Message Feed with Grok-Style Navigation Indicator */}
+        {/* Message Feed with Markdown Support */}
         <div className="flex-1 relative overflow-hidden flex">
           <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 max-w-3xl w-full mx-auto scroll-smooth">
             {messages.map((msg, index) => (
@@ -392,12 +377,33 @@ export default function ChatDashboard() {
                   <div className="flex flex-col items-start gap-1">
                     {msg.usedModel && (
                       <span className="text-[10px] text-zinc-400 font-mono tracking-tight flex items-center gap-1 mb-1">
-                        <Sparkles className="w-3 h-3 text-zinc-400" />
+                        <Sparkles className="w-3 h-3 text-indigo-400" />
                         {msg.usedModel}
                       </span>
                     )}
-                    <div className="max-w-full text-zinc-200 text-[14px] leading-relaxed whitespace-pre-wrap pr-4">
-                      {msg.content}
+                    <div className="max-w-full text-zinc-200 text-[14px] leading-relaxed pr-4 overflow-x-auto">
+                      <ReactMarkdown 
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          table: ({node, ...props}) => (
+                            <table className="border-collapse border border-zinc-700 my-3 text-xs w-full text-left" {...props} />
+                          ),
+                          th: ({node, ...props}) => (
+                            <th className="border border-zinc-700 bg-zinc-800/80 px-3 py-2 font-semibold text-zinc-200" {...props} />
+                          ),
+                          td: ({node, ...props}) => (
+                            <td className="border border-zinc-700/70 px-3 py-1.5 text-zinc-300" {...props} />
+                          ),
+                          p: ({node, ...props}) => <p className="mb-2.5 last:mb-0" {...props} />,
+                          ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-2.5 space-y-1" {...props} />,
+                          ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-2.5 space-y-1" {...props} />,
+                          code: ({node, ...props}) => (
+                            <code className="bg-zinc-800 px-1.5 py-0.5 rounded text-indigo-300 font-mono text-xs" {...props} />
+                          ),
+                        }}
+                      >
+                        {msg.content}
+                      </ReactMarkdown>
                     </div>
                   </div>
                 )}
@@ -407,12 +413,12 @@ export default function ChatDashboard() {
             {loading && (
               <div className="flex items-center gap-2 text-zinc-400 text-xs py-2">
                 <Loader2 className="w-3.5 h-3.5 animate-spin text-zinc-400" />
-                <span>Processing with Gemini AI...</span>
+                <span>Thinking with {modeDetails[selectedMode].name}...</span>
               </div>
             )}
           </div>
 
-          {/* Grok-Style Command Navigator Dots on Right Side */}
+          {/* Jump-To-Prompt Dots */}
           {userPromptIndices.length > 1 && (
             <div className="hidden md:flex flex-col items-center justify-center gap-2 pr-3 pl-1 py-4 z-20 select-none">
               <div className="bg-[#16161b]/80 backdrop-blur border border-zinc-800/80 rounded-full py-2 px-1 flex flex-col items-center gap-2 shadow-lg">
@@ -424,7 +430,6 @@ export default function ChatDashboard() {
                     className="group relative flex items-center justify-center p-1 rounded-full hover:bg-zinc-700/50 transition cursor-pointer"
                   >
                     <span className="h-2 w-2 rounded-full bg-zinc-600 group-hover:bg-indigo-400 transition-all duration-200" />
-                    {/* Tooltip on hover */}
                     <span className="absolute right-6 bg-zinc-900 border border-zinc-700 text-zinc-200 text-[10px] px-2 py-0.5 rounded shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition pointer-events-none">
                       Prompt #{dotIdx + 1}
                     </span>
