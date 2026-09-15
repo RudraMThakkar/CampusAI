@@ -65,6 +65,7 @@ export default function ChatDashboard() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
 
   const langNames: Record<Language, { label: string; native: string }> = {
@@ -103,6 +104,17 @@ export default function ChatDashboard() {
       mode: 'admission_kd' as ServiceMode
     }
   ];
+
+  // Auto-scroll anchor
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, loading]);
 
   useEffect(() => {
     const initAuth = async () => {
@@ -374,30 +386,48 @@ export default function ChatDashboard() {
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
-      let fullResponse = '';
+      
+      // Smooth Queue-based Typewriter Mechanism
+      let tokenQueue = '';
+      let displayedContent = '';
+      let isReading = true;
+
+      const typeInterval = setInterval(() => {
+        if (tokenQueue.length > 0) {
+          // Take 2-3 characters at a time for smooth, natural cadence
+          const chunk = tokenQueue.slice(0, 3);
+          tokenQueue = tokenQueue.slice(3);
+          displayedContent += chunk;
+
+          setMessages((prev) => {
+            const updated = [...prev];
+            const lastMsg = updated[updated.length - 1];
+            if (lastMsg && lastMsg.role === 'assistant') {
+              lastMsg.content = displayedContent;
+            }
+            return updated;
+          });
+          scrollToBottom();
+        } else if (!isReading) {
+          clearInterval(typeInterval);
+          if (currentConvoId && displayedContent) {
+            supabase
+              .from('messages')
+              .insert([{ conversation_id: currentConvoId, role: 'assistant', content: displayedContent, used_model: deskLabel }]);
+          }
+          setLoading(false);
+        }
+      }, 18); // 18ms smooth typewriter pacing
 
       while (true) {
         const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value, { stream: true });
-        fullResponse += chunk;
-
-        setMessages((prev) => {
-          const updated = [...prev];
-          const lastMsg = updated[updated.length - 1];
-          if (lastMsg && lastMsg.role === 'assistant') {
-            lastMsg.content = fullResponse;
-          }
-          return updated;
-        });
+        if (done) {
+          isReading = false;
+          break;
+        }
+        tokenQueue += decoder.decode(value, { stream: true });
       }
 
-      if (currentConvoId && fullResponse) {
-        await supabase
-          .from('messages')
-          .insert([{ conversation_id: currentConvoId, role: 'assistant', content: fullResponse, used_model: deskLabel }]);
-      }
     } catch (err: any) {
       setMessages((prev) => {
         const updated = [...prev];
@@ -408,7 +438,6 @@ export default function ChatDashboard() {
         }
         return updated;
       });
-    } finally {
       setLoading(false);
     }
   };
@@ -745,7 +774,7 @@ export default function ChatDashboard() {
                       ) : (
                         <div className="flex items-center gap-2 text-slate-400 text-xs py-1">
                           <Loader2 className="w-3.5 h-3.5 animate-spin text-[#003366]" />
-                          <span>Streaming answer...</span>
+                          <span>Generating response...</span>
                         </div>
                       )}
                     </div>
@@ -776,6 +805,7 @@ export default function ChatDashboard() {
                 )}
               </div>
             ))}
+            <div ref={messagesEndRef} />
           </div>
 
           {userPromptIndices.length > 1 && (
