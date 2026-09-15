@@ -8,7 +8,7 @@ import {
   FileText, Image as ImageIcon, X, Loader2,
   GraduationCap, HelpCircle,
   Languages, Copy, Check, Share2,
-  Trash2, Edit2
+  Trash2, Edit2, BookOpen, Award, Building, Compass
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -69,8 +69,39 @@ export default function ChatDashboard() {
   const langNames: Record<Language, { label: string; native: string }> = {
     en: { label: 'English', native: 'EN' },
     gu: { label: 'ગુજરાતી', native: 'ગુજ' },
-    hi: { label: 'हिंदी', native: 'हिં' }
+    hi: { label: 'हिंदी', native: 'हिं' }
   };
+
+  const actionCards = [
+    {
+      title: 'ACPDC Admission & Merit',
+      desc: 'Eligibility, 10th cut-offs, and seat matrix for Diploma Computer Engineering.',
+      query: 'What is the ACPDC admission procedure and cut-off for Computer Engineering at K.D. Polytechnic Patan?',
+      icon: Compass,
+      mode: 'admission_kd' as ServiceMode
+    },
+    {
+      title: 'Scholarship Schemes',
+      desc: 'MYSY, Digital Gujarat SC/ST/OBC, and freeship card eligibility.',
+      query: 'What scholarships are available for diploma engineering students in Gujarat (MYSY and Digital Gujarat)?',
+      icon: Award,
+      mode: 'student_assistant' as ServiceMode
+    },
+    {
+      title: 'GTU Syllabus & Exams',
+      desc: 'Semester curriculum, exam form deadlines, and credit scheme.',
+      query: 'How to check GTU Diploma Engineering syllabus, semester credits, and exam schedules?',
+      icon: BookOpen,
+      mode: 'student_assistant' as ServiceMode
+    },
+    {
+      title: 'Hostel & Campus Facilities',
+      desc: 'Boys hostel allocation, annual charges, mess, and laboratory infrastructure.',
+      query: 'What are the hostel admission rules, fees, and campus facilities at K.D. Polytechnic Patan?',
+      icon: Building,
+      mode: 'admission_kd' as ServiceMode
+    }
+  ];
 
   useEffect(() => {
     const initAuth = async () => {
@@ -144,15 +175,12 @@ export default function ChatDashboard() {
     setInput('');
   };
 
-  // --- DELETE CONVERSATION ---
   const handleDeleteConversation = async (e: React.MouseEvent, convoId: string) => {
     e.stopPropagation();
     if (!window.confirm('Delete this conversation permanently?')) return;
 
     try {
-      // 1. Delete messages linked to conversation
       await supabase.from('messages').delete().eq('conversation_id', convoId);
-      // 2. Delete conversation record
       const { error } = await supabase.from('conversations').delete().eq('id', convoId);
 
       if (!error) {
@@ -166,7 +194,6 @@ export default function ChatDashboard() {
     }
   };
 
-  // --- RENAME CONVERSATION ---
   const startRenaming = (e: React.MouseEvent, convo: ConversationItem) => {
     e.stopPropagation();
     setEditingChatId(convo.id);
@@ -259,9 +286,12 @@ export default function ChatDashboard() {
     setAttachedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSend = async (overrideText?: string) => {
+  const handleSend = async (overrideText?: string, overrideMode?: ServiceMode) => {
     const textToSend = (overrideText || input).trim();
     if ((!textToSend && attachedFiles.length === 0) || loading) return;
+
+    const activeMode = overrideMode || selectedMode;
+    if (overrideMode) setSelectedMode(overrideMode);
 
     const userFiles = [...attachedFiles];
     setInput('');
@@ -279,7 +309,7 @@ export default function ChatDashboard() {
         const titleSnippet = textToSend.slice(0, 28) || 'New Query';
         const { data: newConvo } = await supabase
           .from('conversations')
-          .insert([{ user_id: userId, title: titleSnippet, mode: selectedMode }])
+          .insert([{ user_id: userId, title: titleSnippet, mode: activeMode }])
           .select()
           .single();
 
@@ -301,7 +331,7 @@ export default function ChatDashboard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: textToSend,
-          mode: selectedMode,
+          mode: activeMode,
           language: lang,
         }),
       });
@@ -312,7 +342,7 @@ export default function ChatDashboard() {
         throw new Error(data.error || `HTTP ${res.status}`);
       }
 
-      const deskLabel = selectedMode === 'admission_kd' ? 'KD Admission Desk' : 'Student Assistant Desk';
+      const deskLabel = activeMode === 'admission_kd' ? 'KD Admission Desk' : 'Student Assistant Desk';
 
       setMessages((prev) => [
         ...prev,
@@ -447,7 +477,6 @@ export default function ChatDashboard() {
                     </div>
                   )}
 
-                  {/* Actions on Hover */}
                   {editingChatId !== convo.id && (
                     <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity flex-shrink-0 ml-1">
                       <button
@@ -499,7 +528,6 @@ export default function ChatDashboard() {
               </button>
             )}
 
-            {/* Simple Service Pill Toggle */}
             <div className="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200">
               <button
                 type="button"
@@ -539,7 +567,6 @@ export default function ChatDashboard() {
               <span>{sharedCopied ? 'Copied' : 'Share'}</span>
             </button>
 
-            {/* Multilingual Selector */}
             <div className="relative" ref={langDropdownRef}>
               <button
                 type="button"
@@ -573,9 +600,53 @@ export default function ChatDashboard() {
           </div>
         </header>
 
-        {/* Message Feed */}
+        {/* Message Feed & Action Cards */}
         <div className="flex-1 relative overflow-hidden flex">
           <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 max-w-3xl w-full mx-auto scroll-smooth">
+            
+            {/* Quick Action Cards on Empty/Initial Chat */}
+            {messages.length === 1 && (
+              <div className="pt-2 pb-4">
+                <div className="text-center mb-6">
+                  <div className="inline-flex p-3 rounded-2xl bg-amber-500/10 text-amber-700 border border-amber-400/30 mb-3">
+                    <GraduationCap className="w-7 h-7 text-[#003366]" />
+                  </div>
+                  <h3 className="text-base font-bold text-slate-800">
+                    K.D. Polytechnic Patan Academic Portal
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+                    Select a frequently asked inquiry below or type your questions regarding admission, scholarships, and GTU exams.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {actionCards.map((card, idx) => {
+                    const CardIcon = card.icon;
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => handleSend(card.query, card.mode)}
+                        className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-white hover:border-[#003366] hover:shadow-md transition text-left cursor-pointer group"
+                      >
+                        <div className="p-2 rounded-lg bg-slate-100 text-[#003366] group-hover:bg-[#003366] group-hover:text-white transition flex-shrink-0">
+                          <CardIcon className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-bold text-slate-800 group-hover:text-[#003366] transition">
+                            {card.title}
+                          </h4>
+                          <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">
+                            {card.desc}
+                          </p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {messages.map((msg, index) => (
               <div 
                 key={index} 
