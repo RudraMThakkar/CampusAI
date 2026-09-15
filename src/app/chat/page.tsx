@@ -9,7 +9,7 @@ import {
   FileText, Image as ImageIcon, X, Loader2,
   GraduationCap, HelpCircle,
   Languages, Copy, Check, Share2,
-  Trash2, Edit2, BookOpen, Award, Building, Compass
+  Trash2, Edit2, BookOpen, Award, Building, Compass, UserCheck
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -38,8 +38,115 @@ interface ConversationItem {
   created_at: string;
 }
 
+// Complete UI Translations Dictionary
+const UI_TEXT = {
+  en: {
+    appTitle: 'K.D. Polytechnic AI',
+    newChat: 'New Chat',
+    campusServices: 'Campus Services',
+    admissionDesk: 'KD Admission Desk',
+    studentAssistant: 'AI Student Assistant',
+    recentConversations: 'Recent Conversations',
+    noChats: 'No previous chats',
+    guestBanner: 'Guest Session (Unsaved)',
+    guestNotice: 'Guest chats are private and not saved',
+    signOut: 'Sign Out',
+    exitGuest: 'Exit Guest Mode',
+    share: 'Share',
+    copied: 'Copied',
+    welcomeTitle: 'K.D. Polytechnic Patan Academic Portal',
+    welcomeSubtitle: 'Select a frequently asked inquiry below or type your questions regarding admission, scholarships, and GTU exams.',
+    inputPlaceholderAdmission: 'Ask about admission procedure, ACPDC merit, eligibility, or hostel...',
+    inputPlaceholderStudent: 'Ask about scholarships, GTU exam forms, syllabus, or circulars...',
+    footerNote: 'Kilachand Devchand Polytechnic, Patan • GTU Affiliated Government Institute Helpdesk',
+    generating: 'Generating response...',
+    card1Title: 'ACPDC Admission & Merit',
+    card1Desc: 'Eligibility, 10th cut-offs, and seat matrix for Diploma Computer Engineering.',
+    card1Query: 'What is the ACPDC admission procedure and cut-off for Computer Engineering at K.D. Polytechnic Patan?',
+    card2Title: 'Scholarship Schemes',
+    card2Desc: 'MYSY, Digital Gujarat SC/ST/OBC, and freeship card eligibility.',
+    card2Query: 'What scholarships are available for diploma engineering students in Gujarat (MYSY and Digital Gujarat)?',
+    card3Title: 'GTU Syllabus & Exams',
+    card3Desc: 'Semester curriculum, exam form deadlines, and credit scheme.',
+    card3Query: 'How to check GTU Diploma Engineering syllabus, semester credits, and exam schedules?',
+    card4Title: 'Hostel & Campus Facilities',
+    card4Desc: 'Boys hostel allocation, annual charges, mess, and laboratory infrastructure.',
+    card4Query: 'What are the hostel admission rules, fees, and campus facilities at K.D. Polytechnic Patan?',
+    initialWelcome: 'Welcome to K.D. Polytechnic Patan Helpdesk! You can ask questions regarding admissions, fees, eligibility, hostel facilities, or GTU student services.'
+  },
+  gu: {
+    appTitle: 'કે.ડી. પોલિટેકનિક AI',
+    newChat: 'નવી વાતચીત',
+    campusServices: 'કેમ્પસ સેવાઓ',
+    admissionDesk: 'કે.ડી. પ્રવેશ સહાયતા',
+    studentAssistant: 'વિદ્યાર્થી સહાયક AI',
+    recentConversations: 'તાજેતરની વાતચીત',
+    noChats: 'કોઈ જૂની વાતચીત નથી',
+    guestBanner: 'મહેમાન સત્ર (સેવ નહીં થાય)',
+    guestNotice: 'મહેમાન ચેટ્સ ખાનગી છે અને સાચવવામાં આવતી નથી',
+    signOut: 'સાઇન આઉટ',
+    exitGuest: 'ગેસ્ટ મોડમાંથી બહાર નીકળો',
+    share: 'શેર કરો',
+    copied: 'કૉપિ થઈ ગયું',
+    welcomeTitle: 'કે.ડી. પોલિટેકનિક પાટણ શૈક્ષણિક પોર્ટલ',
+    welcomeSubtitle: 'નીચે આપેલા મહત્વના પ્રશ્નોમાંથી પસંદ કરો અથવા પ્રવેશ, શિષ્યવૃત્તિ અને જીટીયુ પરીક્ષા સંબંધિત પ્રશ્નો પૂછો.',
+    inputPlaceholderAdmission: 'પ્રવેશ પ્રક્રિયા, ACPDC મેરિટ, લાયકાત અથવા હોસ્ટેલ વિશે પૂછો...',
+    inputPlaceholderStudent: 'શિષ્યવૃત્તિ (MYSY), GTU પરીક્ષા ફોર્મ, અભ્યાસક્રમ અથવા પરિપત્રો વિશે પૂછો...',
+    footerNote: 'કિલાચંદ દેવચંદ પોલિટેકનિક, પાટણ • GTU સંલગ્ન સરકારી ઇન્સ્ટિટ્યૂટ હેલ્પડેસ્ક',
+    generating: 'જવાબ તૈયાર થઈ રહ્યો છે...',
+    card1Title: 'ACPDC પ્રવેશ અને મેરિટ',
+    card1Desc: 'ડિપ્લોમા કમ્પ્યુટર એન્જિનિયરિંગ માટે લાયકાત, ૧૦મા પછીના કટ-ઓફ અને બેઠકોની વિગત.',
+    card1Query: 'કે.ડી. પોલિટેકનિક પાટણમાં કમ્પ્યુટર એન્જિનિયરિંગ માટે ACPDC પ્રવેશ પ્રક્રિયા અને મેરિટ કટ-ઓફ શું છે?',
+    card2Title: 'શિષ્યવૃત્તિ યોજનાઓ',
+    card2Desc: 'MYSY, ડિજિટલ ગુજરાત SC/ST/OBC અને ફ્રીશીપ કાર્ડની લાયકાત.',
+    card2Query: 'ગુજરાતમાં ડિપ્લોમા એન્જિનિયરિંગ વિદ્યાર્થીઓ માટે કઈ શિષ્યવૃત્તિઓ ઉપલબ્ધ છે (MYSY અને ડિજિટલ ગુજરાત)?',
+    card3Title: 'GTU અભ્યાસક્રમ અને પરીક્ષાઓ',
+    card3Desc: 'સેમેસ્ટર અભ્યાસક્રમ, પરીક્ષા ફોર્મ ભરવાની તારીખો અને ક્રેડિટ સિસ્ટમ.',
+    card3Query: 'GTU ડિપ્લોમા એન્જિનિયરિંગનો સિલેબસ, ક્રેડિટ સ્કીમ અને પરીક્ષા ટાઈમટેબલ કેવી રીતે તપાસવું?',
+    card4Title: 'હોસ્ટેલ અને કેમ્પસ સુવિધાઓ',
+    card4Desc: 'બોયઝ હોસ્ટેલ પ્રવેશ, વાર્ષિક ફી, મેસ અને પ્રયોગશાળા સુવિધાઓ.',
+    card4Query: 'કે.ડી. પોલિટેકનિક પાટણ ખાતે હોસ્ટેલના નિયમો, ફી અને કેમ્પસની સુવિધાઓ શું છે?',
+    initialWelcome: 'કે.ડી. પોલિટેકનિક પાટણ હેલ્પડેસ્કમાં આપનું સ્વાગત છે! આપ પ્રવેશ, ફી, હોસ્ટેલ અથવા જીટીયુ વિદ્યાર્થી સેવાઓ વિશે પૂછી શકો છો.'
+  },
+  hi: {
+    appTitle: 'के.डी. पॉलिटेक्निक AI',
+    newChat: 'नई बातचीत',
+    campusServices: 'परिसर सेवाएँ',
+    admissionDesk: 'के.डी. प्रवेश डेस्क',
+    studentAssistant: 'विद्यार्थी सहायक AI',
+    recentConversations: 'हाल की बातचीत',
+    noChats: 'कोई पुरानी बातचीत नहीं',
+    guestBanner: 'अतिथि सत्र (सेव नहीं होगा)',
+    guestNotice: 'अतिथि चैट निजी हैं और सहेजी नहीं जाती हैं',
+    signOut: 'साइन आउट',
+    exitGuest: 'गेस्ट मोड से बाहर निकलें',
+    share: 'शेयर करें',
+    copied: 'कॉपी हुआ',
+    welcomeTitle: 'के.डी. पॉलिटेक्निक पाटन शैक्षणिक पोर्टल',
+    welcomeSubtitle: 'नीचे दिए गए महत्वपूर्ण प्रश्नों में से चुनें या प्रवेश, छात्रवृत्ति और जीटीयू परीक्षा संबंधी प्रश्न पूछें।',
+    inputPlaceholderAdmission: 'प्रवेश प्रक्रिया, ACPDC मेरिट, योग्यता या हॉस्टल के बारे में पूछें...',
+    inputPlaceholderStudent: 'छात्रवृत्ति (MYSY), GTU परीक्षा फॉर्म, पाठ्यक्रम या परिपत्रों के बारे में पूछें...',
+    footerNote: 'किलाचंद देवचंद पॉलिटेक्निक, पाटन • GTU संबद्ध सरकारी संस्थान हेल्पडेस्क',
+    generating: 'उत्तर तैयार हो रहा है...',
+    card1Title: 'ACPDC प्रवेश और मेरिट',
+    card1Desc: 'डिप्लोमा कंप्यूटर इंजीनियरिंग के लिए पात्रता, 10वीं के कट-ऑफ और सीटों का विवरण।',
+    card1Query: 'के.डी. पॉलिटेक्निक पाटन में कंप्यूटर इंजीनियरिंग के लिए ACPDC प्रवेश प्रक्रिया और कट-ऑफ क्या है?',
+    card2Title: 'छात्रवृत्ति योजनाएँ',
+    card2Desc: 'MYSY, डिजिटल गुजरात SC/ST/OBC और फ्रीशिप कार्ड की पात्रता।',
+    card2Query: 'गुजरात में डिप्लोमा इंजीनियरिंग छात्रों के लिए कौन सी छात्रवृत्तियाँ उपलब्ध हैं (MYSY और डिजिटल गुजरात)?',
+    card3Title: 'GTU पाठ्यक्रम और परीक्षाएँ',
+    card3Desc: 'सेमेस्टर पाठ्यक्रम, परीक्षा फॉर्म की समय-सीमा और क्रेडिट योजना।',
+    card3Query: 'GTU डिप्लोमा इंजीनियरिंग पाठ्यक्रम, क्रेडिट और परीक्षा कार्यक्रम कैसे देखें?',
+    card4Title: 'हॉस्टल और परिसर सुविधाएँ',
+    card4Desc: 'बॉयज हॉस्टल आवंटन, वार्षिक शुल्क, मेस और प्रयोगशाला की सुविधा।',
+    card4Query: 'के.डी. पॉलिटेक्निक पाटन में हॉस्टल नियम, शुल्क और परिसर की सुविधाएँ क्या हैं?',
+    initialWelcome: 'के.डी. पॉलिटेक्निक पाटन हेल्पडेस्क में आपका स्वागत है! आप प्रवेश, शुल्क, हॉस्टल या जीटीयू छात्र सेवाओं के बारे में प्रश्न पूछ सकते हैं।'
+  }
+};
+
 export default function ChatDashboard() {
   const [userId, setUserId] = useState<string | null>(null);
+  const [isGuest, setIsGuest] = useState(false);
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
 
@@ -49,10 +156,13 @@ export default function ChatDashboard() {
   const [selectedMode, setSelectedMode] = useState<ServiceMode>('admission_kd');
   const [lang, setLang] = useState<Language>('en');
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
+  
+  const t = UI_TEXT[lang];
+
   const [messages, setMessages] = useState<Message[]>([
     { 
       role: 'assistant', 
-      content: 'Welcome to K.D. Polytechnic Patan Helpdesk! You can ask questions regarding admissions, fees, eligibility, hostel facilities, or GTU student services.' 
+      content: UI_TEXT.en.initialWelcome 
     }
   ]);
   const [input, setInput] = useState('');
@@ -61,6 +171,8 @@ export default function ChatDashboard() {
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [sharedCopied, setSharedCopied] = useState(false);
+
+  const isUserScrolledUpRef = useRef<boolean>(false);
 
   const langDropdownRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -77,46 +189,63 @@ export default function ChatDashboard() {
 
   const actionCards = [
     {
-      title: 'ACPDC Admission & Merit',
-      desc: 'Eligibility, 10th cut-offs, and seat matrix for Diploma Computer Engineering.',
-      query: 'What is the ACPDC admission procedure and cut-off for Computer Engineering at K.D. Polytechnic Patan?',
+      title: t.card1Title,
+      desc: t.card1Desc,
+      query: t.card1Query,
       icon: Compass,
       mode: 'admission_kd' as ServiceMode
     },
     {
-      title: 'Scholarship Schemes',
-      desc: 'MYSY, Digital Gujarat SC/ST/OBC, and freeship card eligibility.',
-      query: 'What scholarships are available for diploma engineering students in Gujarat (MYSY and Digital Gujarat)?',
+      title: t.card2Title,
+      desc: t.card2Desc,
+      query: t.card2Query,
       icon: Award,
       mode: 'student_assistant' as ServiceMode
     },
     {
-      title: 'GTU Syllabus & Exams',
-      desc: 'Semester curriculum, exam form deadlines, and credit scheme.',
-      query: 'How to check GTU Diploma Engineering syllabus, semester credits, and exam schedules?',
+      title: t.card3Title,
+      desc: t.card3Desc,
+      query: t.card3Query,
       icon: BookOpen,
       mode: 'student_assistant' as ServiceMode
     },
     {
-      title: 'Hostel & Campus Facilities',
-      desc: 'Boys hostel allocation, annual charges, mess, and laboratory infrastructure.',
-      query: 'What are the hostel admission rules, fees, and campus facilities at K.D. Polytechnic Patan?',
+      title: t.card4Title,
+      desc: t.card4Desc,
+      query: t.card4Query,
       icon: Building,
       mode: 'admission_kd' as ServiceMode
     }
   ];
 
-  const scrollToBottom = () => {
-    if (chatContainerRef.current) {
+  const scrollToBottom = (force = false) => {
+    if (!chatContainerRef.current) return;
+    if (force || !isUserScrolledUpRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, loading]);
+  const handleContainerScroll = () => {
+    if (!chatContainerRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+    isUserScrolledUpRef.current = distanceFromBottom > 120;
+  };
+
+  const handleUserWheel = (e: React.WheelEvent) => {
+    if (e.deltaY < 0) {
+      isUserScrolledUpRef.current = true;
+    }
+  };
 
   useEffect(() => {
+    const checkGuestMode = typeof window !== 'undefined' && sessionStorage.getItem('isGuest') === 'true';
+
+    if (checkGuestMode) {
+      setIsGuest(true);
+      return;
+    }
+
     const initAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -148,6 +277,8 @@ export default function ChatDashboard() {
   };
 
   const loadConversationMessages = async (convoId: string, convoMode?: string) => {
+    if (isGuest) return;
+
     try {
       setActiveConversationId(convoId);
       if (convoMode === 'student_assistant' || convoMode === 'admission_kd') {
@@ -168,6 +299,8 @@ export default function ChatDashboard() {
             serviceTitle: m.used_model,
           }))
         );
+        isUserScrolledUpRef.current = false;
+        setTimeout(() => scrollToBottom(true), 50);
       }
     } catch (err) {
       console.warn('Failed to load messages:', err);
@@ -179,17 +312,17 @@ export default function ChatDashboard() {
     setMessages([
       { 
         role: 'assistant', 
-        content: selectedMode === 'admission_kd' 
-          ? 'Welcome to the KD Admission Desk! Ask any questions regarding the admission process, merit lists, or branch eligibility.'
-          : 'Welcome to Student Services! Ask any questions regarding scholarships, GTU exam forms, or academic results.'
+        content: t.initialWelcome
       }
     ]);
     setAttachedFiles([]);
     setInput('');
+    isUserScrolledUpRef.current = false;
   };
 
   const handleDeleteConversation = async (e: React.MouseEvent, convoId: string) => {
     e.stopPropagation();
+    if (isGuest) return;
     if (!window.confirm('Delete this conversation permanently?')) return;
 
     try {
@@ -209,6 +342,7 @@ export default function ChatDashboard() {
 
   const startRenaming = (e: React.MouseEvent, convo: ConversationItem) => {
     e.stopPropagation();
+    if (isGuest) return;
     setEditingChatId(convo.id);
     setEditTitleInput(convo.title);
   };
@@ -216,6 +350,8 @@ export default function ChatDashboard() {
   const handleSaveRename = async (e: React.FormEvent | React.FocusEvent, convoId: string) => {
     e.preventDefault();
     e.stopPropagation();
+    if (isGuest) return;
+
     const trimmed = editTitleInput.trim();
     if (!trimmed) {
       setEditingChatId(null);
@@ -247,7 +383,7 @@ export default function ChatDashboard() {
   };
 
   const handleShareChat = () => {
-    if (!activeConversationId) {
+    if (isGuest || !activeConversationId) {
       navigator.clipboard.writeText(window.location.href);
     } else {
       const shareUrl = `${window.location.origin}/chat?convoId=${activeConversationId}`;
@@ -271,6 +407,7 @@ export default function ChatDashboard() {
     const target = messageRefs.current[index];
     if (target) {
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      isUserScrolledUpRef.current = true;
     }
   };
 
@@ -331,7 +468,7 @@ export default function ChatDashboard() {
     setAttachedFiles([]);
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
 
-    const deskLabel = activeMode === 'admission_kd' ? 'KD Admission Desk' : 'Student Assistant Desk';
+    const deskLabel = activeMode === 'admission_kd' ? t.admissionDesk : t.studentAssistant;
 
     setMessages((prev) => [
       ...prev,
@@ -340,10 +477,13 @@ export default function ChatDashboard() {
     ]);
     setLoading(true);
 
+    isUserScrolledUpRef.current = false;
+    setTimeout(() => scrollToBottom(true), 20);
+
     try {
       let currentConvoId = activeConversationId;
 
-      if (!currentConvoId && userId) {
+      if (!isGuest && !currentConvoId && userId) {
         const titleSnippet = textToSend.slice(0, 28) || (userFiles[0]?.name.slice(0, 28) ?? 'Document Inquiry');
         const { data: newConvo } = await supabase
           .from('conversations')
@@ -358,7 +498,7 @@ export default function ChatDashboard() {
         }
       }
 
-      if (currentConvoId) {
+      if (!isGuest && currentConvoId) {
         await supabase
           .from('messages')
           .insert([{ conversation_id: currentConvoId, role: 'user', content: textToSend || `[Attached: ${userFiles.map((f) => f.name).join(', ')}]` }]);
@@ -405,10 +545,11 @@ export default function ChatDashboard() {
             }
             return updated;
           });
-          scrollToBottom();
+
+          scrollToBottom(false);
         } else if (!isReading) {
           clearInterval(typeInterval);
-          if (currentConvoId && displayedContent) {
+          if (!isGuest && currentConvoId && displayedContent) {
             supabase
               .from('messages')
               .insert([{ conversation_id: currentConvoId, role: 'assistant', content: displayedContent, used_model: deskLabel }]);
@@ -448,6 +589,11 @@ export default function ChatDashboard() {
   };
 
   const handleLogout = async () => {
+    if (isGuest) {
+      sessionStorage.removeItem('isGuest');
+      window.location.href = '/';
+      return;
+    }
     await supabase.auth.signOut();
     window.location.href = '/';
   };
@@ -458,13 +604,13 @@ export default function ChatDashboard() {
 
   return (
     <div className="flex h-screen w-full bg-slate-100 text-slate-800 font-sans antialiased">
-      {/* Sidebar: Deep Academic Navy */}
+      {/* Sidebar */}
       <aside className={`${isSidebarOpen ? 'w-64' : 'w-0'} transition-all duration-200 border-r border-[#13395e] bg-[#0b2545] text-slate-100 flex flex-col justify-between overflow-hidden flex-shrink-0 shadow-lg`}>
         <div className="p-3 flex flex-col gap-3 min-w-[16rem] overflow-y-auto">
           <div className="flex items-center justify-between px-2 pt-1">
             <span className="font-bold text-sm tracking-wide text-white flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full bg-amber-400 ring-4 ring-amber-400/20" />
-              K.D. Polytechnic AI
+              {t.appTitle}
             </span>
             <button 
               onClick={() => setIsSidebarOpen(false)}
@@ -474,16 +620,23 @@ export default function ChatDashboard() {
             </button>
           </div>
 
+          {isGuest && (
+            <div className="flex items-center gap-2 bg-amber-500/15 border border-amber-400/30 text-amber-300 px-2.5 py-1.5 rounded-lg text-[11px] font-medium">
+              <UserCheck className="w-3.5 h-3.5 flex-shrink-0" />
+              <span>{t.guestBanner}</span>
+            </div>
+          )}
+
           <button 
             onClick={startNewChat}
             className="flex items-center gap-2 w-full py-2 px-3 rounded-lg border border-amber-500/30 bg-[#13395e] hover:bg-[#184877] text-white text-xs font-semibold transition cursor-pointer shadow-sm"
           >
             <Plus className="w-3.5 h-3.5 text-amber-300" />
-            <span>New Chat</span>
+            <span>{t.newChat}</span>
           </button>
 
           <div className="mt-2 flex flex-col gap-1">
-            <div className="text-[11px] font-semibold text-slate-300 px-2 py-1 uppercase tracking-wider">Campus Services</div>
+            <div className="text-[11px] font-semibold text-slate-300 px-2 py-1 uppercase tracking-wider">{t.campusServices}</div>
             
             <button 
               onClick={() => setSelectedMode('admission_kd')}
@@ -492,7 +645,7 @@ export default function ChatDashboard() {
               }`}
             >
               <GraduationCap className="w-4 h-4 text-amber-300 flex-shrink-0" />
-              <span className="truncate">KD Admission Desk</span>
+              <span className="truncate">{t.admissionDesk}</span>
             </button>
 
             <button 
@@ -502,14 +655,16 @@ export default function ChatDashboard() {
               }`}
             >
               <HelpCircle className="w-4 h-4 text-amber-300 flex-shrink-0" />
-              <span className="truncate">AI Student Assistant</span>
+              <span className="truncate">{t.studentAssistant}</span>
             </button>
           </div>
 
           <div className="mt-2 flex flex-col gap-0.5">
-            <div className="text-[11px] font-semibold text-slate-300 px-2 py-1 uppercase tracking-wider">Recent Conversations</div>
-            {conversations.length === 0 ? (
-              <p className="text-[11px] text-slate-300 px-2 py-1 italic">No previous chats</p>
+            <div className="text-[11px] font-semibold text-slate-300 px-2 py-1 uppercase tracking-wider">{t.recentConversations}</div>
+            {isGuest ? (
+              <p className="text-[11px] text-slate-400 px-2 py-1 italic">{t.guestNotice}</p>
+            ) : conversations.length === 0 ? (
+              <p className="text-[11px] text-slate-300 px-2 py-1 italic">{t.noChats}</p>
             ) : (
               conversations.map((convo) => (
                 <div 
@@ -576,14 +731,13 @@ export default function ChatDashboard() {
             className="flex items-center gap-2 text-xs text-slate-300 hover:text-white w-full px-2 py-2 rounded-lg hover:bg-[#13395e] transition cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
-            <span>Sign Out</span>
+            <span>{isGuest ? t.exitGuest : t.signOut}</span>
           </button>
         </div>
       </aside>
 
-      {/* Main Workspace */}
+      {/* Main Container */}
       <main className="flex-1 flex flex-col h-full relative bg-slate-50 overflow-hidden">
-        {/* Header Bar */}
         <header className="h-14 border-b border-slate-200 bg-white px-4 flex items-center justify-between flex-shrink-0 shadow-xs">
           <div className="flex items-center gap-2">
             {!isSidebarOpen && (
@@ -606,7 +760,7 @@ export default function ChatDashboard() {
                 }`}
               >
                 <GraduationCap className="w-3.5 h-3.5" />
-                <span>Admission Desk</span>
+                <span>{t.admissionDesk}</span>
               </button>
               <button
                 type="button"
@@ -618,7 +772,7 @@ export default function ChatDashboard() {
                 }`}
               >
                 <HelpCircle className="w-3.5 h-3.5" />
-                <span>Student Assistant</span>
+                <span>{t.studentAssistant}</span>
               </button>
             </div>
           </div>
@@ -631,7 +785,7 @@ export default function ChatDashboard() {
               title="Copy share link"
             >
               {sharedCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5 text-slate-500" />}
-              <span>{sharedCopied ? 'Copied' : 'Share'}</span>
+              <span>{sharedCopied ? t.copied : t.share}</span>
             </button>
 
             <div className="relative" ref={langDropdownRef}>
@@ -667,10 +821,15 @@ export default function ChatDashboard() {
           </div>
         </header>
 
-        {/* Message Feed & Action Cards */}
+        {/* Message Feed Container */}
         <div className="flex-1 relative overflow-hidden flex">
-          <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 max-w-3xl w-full mx-auto scroll-smooth">
-            
+          <div 
+            ref={chatContainerRef} 
+            onScroll={handleContainerScroll}
+            onWheel={handleUserWheel}
+            onTouchMove={handleContainerScroll}
+            className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 max-w-3xl w-full mx-auto"
+          >
             {messages.length === 1 && (
               <div className="pt-2 pb-4">
                 <div className="text-center mb-6">
@@ -678,10 +837,10 @@ export default function ChatDashboard() {
                     <GraduationCap className="w-7 h-7 text-[#003366]" />
                   </div>
                   <h3 className="text-base font-bold text-slate-800">
-                    K.D. Polytechnic Patan Academic Portal
+                    {t.welcomeTitle}
                   </h3>
                   <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-                    Select a frequently asked inquiry below or type your questions regarding admission, scholarships, and GTU exams.
+                    {t.welcomeSubtitle}
                   </p>
                 </div>
 
@@ -783,7 +942,7 @@ export default function ChatDashboard() {
                       ) : (
                         <div className="flex items-center gap-2 text-slate-400 text-xs py-1">
                           <Loader2 className="w-3.5 h-3.5 animate-spin text-[#003366]" />
-                          <span>Generating response...</span>
+                          <span>{t.generating}</span>
                         </div>
                       )}
                     </div>
@@ -799,7 +958,7 @@ export default function ChatDashboard() {
                           {copiedIndex === index ? (
                             <>
                               <Check className="w-3 h-3 text-emerald-600" />
-                              <span className="text-emerald-600 font-medium">Copied</span>
+                              <span className="text-emerald-600 font-medium">{t.copied}</span>
                             </>
                           ) : (
                             <>
@@ -863,8 +1022,8 @@ export default function ChatDashboard() {
               onKeyDown={handleKeyDown}
               placeholder={
                 selectedMode === 'admission_kd'
-                  ? 'Ask about admission procedure, ACPDC merit, eligibility, or hostel...'
-                  : 'Ask about scholarships, GTU exam forms, syllabus, or circulars...'
+                  ? t.inputPlaceholderAdmission
+                  : t.inputPlaceholderStudent
               }
               className="w-full bg-transparent px-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none resize-none min-h-[24px] max-h-[180px] leading-relaxed"
             />
@@ -900,7 +1059,7 @@ export default function ChatDashboard() {
             </div>
           </div>
           <p className="text-[11px] text-center text-slate-500 mt-2">
-            Kilachand Devchand Polytechnic, Patan • GTU Affiliated Government Institute Helpdesk
+            {t.footerNote}
           </p>
         </div>
       </main>

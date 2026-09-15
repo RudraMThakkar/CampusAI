@@ -235,6 +235,26 @@ export default function LoginPage() {
               <span>Sign in with Google</span>
             </button>
 
+            {/* Divider */}
+<div className="relative my-4 flex items-center justify-center">
+  <div className="border-t border-slate-200 w-full" />
+  <span className="bg-white px-2 text-xs text-slate-400 uppercase tracking-wider">or</span>
+  <div className="border-t border-slate-200 w-full" />
+</div>
+
+{/* Continue as Guest Button */}
+<button
+  type="button"
+  onClick={() => {
+    sessionStorage.setItem('isGuest', 'true');
+    window.location.href = '/chat';
+  }}
+  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition cursor-pointer shadow-xs"
+>
+  <span>Continue as Guest</span>
+  <span className="text-[10px] text-slate-400 font-normal">(No chat history saved)</span>
+</button>
+
             <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
               <span className="text-slate-500">
                 {isSignUp ? 'Already have an account?' : "Don't have an account?"}
