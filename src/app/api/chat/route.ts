@@ -1,16 +1,20 @@
-import { NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { message, mode, language, files } = body;
 
     if (!message && (!files || files.length === 0)) {
-      return NextResponse.json({ error: 'Message or file is required' }, { status: 400 });
+      return new Response(JSON.stringify({ error: 'Message or file is required' }), { status: 400 });
     }
 
-    const geminiKey = process.env.GEMINI_API_KEY;
-    const openrouterKey = process.env.OPENROUTER_API_KEY;
+    const rawKeys = process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY || '';
+    const geminiKeys = rawKeys.split(',').map((k) => k.trim()).filter(Boolean);
+
+    if (geminiKeys.length === 0) {
+      return new Response(JSON.stringify({ error: 'No Gemini API keys found.' }), { status: 500 });
+    }
 
     let systemContext = 'You are KD Campus AI, the official academic intelligence assistant for Kilachand Devchand (K.D.) Polytechnic, Patan.';
 
@@ -21,70 +25,36 @@ Verified Ground-Truth (https://kdppatan.ac.in):
 - Admission: Centralized Online Admission via ACPDC Gujarat (Merit & Reservation: OPEN, SEBC, SC, ST, EWS, TFW).
 - Programs: 3-Year Diploma Engineering in Computer, IT, Civil, Mechanical, and Electrical.
 - Fees: Government nominal fee (~₹1000/year for boys, free for girls under government schemes).
-- DDCET: Diploma to Degree Common Entrance Test for direct 2nd-year engineering admission after diploma.
 - Facilities: Advanced Computing Labs, High-Speed Internet/LAN, Boys Hostel on campus, GTU-aligned syllabus.
-When an image or document is attached (e.g. marksheet, merit receipt), extract key details like marks, percentages, seat numbers, or eligibility.
-Respond in ${language === 'gu' ? 'Gujarati' : language === 'hi' ? 'Hindi' : 'English'}.`;
-    } else if (mode === 'student_assistant') {
-      systemContext = `You are the KD Campus AI Student Services Assistant helping with scholarships (Digital Gujarat MYSY, Freeship card for SC/ST/SEBC), GTU exam forms, latest circulars, semester syllabus, and results (result.gtu.ac.in).
-When an image or document is attached (e.g. hall ticket, circular, grade card), analyze and explain the academic instructions clearly.
+When analyzing documents/marksheets, summarize key details (marks, seat no, verification status) accurately.
 Respond in ${language === 'gu' ? 'Gujarati' : language === 'hi' ? 'Hindi' : 'English'}.`;
     } else {
-      systemContext += ` Provide structured, well-formatted Markdown responses. Language: ${language === 'gu' ? 'Gujarati' : language === 'hi' ? 'Hindi' : 'English'}.`;
+      systemContext = `You are the KD Campus AI Student Services Assistant helping with scholarships (Digital Gujarat MYSY, Freeship card for SC/ST/SEBC), GTU exam forms, syllabus, and results (result.gtu.ac.in).
+When an image or document is attached, read and explain the academic details clearly.
+Respond in ${language === 'gu' ? 'Gujarati' : language === 'hi' ? 'Hindi' : 'English'}.`;
     }
 
-    const selectedModelBadge = mode === 'admission_kd' ? 'KD Admission Desk' : 'Student Assistant Desk';
+    const parts: any[] = [];
+    parts.push({ text: `${systemContext}\n\nUser Question: ${message || 'Please analyze this attached document/image thoroughly.'}` });
 
-    // Helper function for OpenRouter fallback
-    const queryOpenRouter = async () => {
-      if (!openrouterKey) return null;
-      try {
-        const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${openrouterKey}`,
-            'HTTP-Referer': 'https://campusai-cnlf.onrender.com',
-            'X-Title': 'KD Campus AI',
-          },
-          body: JSON.stringify({
-            model: 'stealth/ox-alpha',
-            messages: [
-              { role: 'system', content: systemContext },
-              { role: 'user', content: message || 'Please analyze this inquiry.' },
-            ],
-          }),
-        });
-
-        const data = await res.json();
-        return data.choices?.[0]?.message?.content || null;
-      } catch {
-        return null;
-      }
-    };
-
-    // 1. Primary Engine: Gemini 3.6 Flash (Official latest model)
-    if (geminiKey) {
-      try {
-        const generateUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${geminiKey}`;
-
-        const parts: any[] = [];
-        parts.push({ text: `${systemContext}\n\nUser Question: ${message || 'Please analyze the attached document or image.'}` });
-
-        if (files && Array.isArray(files) && files.length > 0) {
-          for (const file of files) {
-            if (file.data && file.type) {
-              parts.push({
-                inline_data: {
-                  mime_type: file.type,
-                  data: file.data,
-                },
-              });
-            }
-          }
+    if (files && Array.isArray(files) && files.length > 0) {
+      for (const file of files) {
+        if (file.data && file.type) {
+          parts.push({
+            inline_data: {
+              mime_type: file.type,
+              data: file.data,
+            },
+          });
         }
+      }
+    }
 
-        const genRes = await fetch(generateUrl, {
+    for (const key of geminiKeys) {
+      try {
+        const streamUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:streamGenerateContent?alt=sse&key=${key}`;
+
+        const geminiRes = await fetch(streamUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -92,51 +62,64 @@ Respond in ${language === 'gu' ? 'Gujarati' : language === 'hi' ? 'Hindi' : 'Eng
           }),
         });
 
-        const genData = await genRes.json();
-
-        if (genData.error) {
-          console.warn('Gemini error/quota, switching to backup...', genData.error);
-          const fallbackReply = await queryOpenRouter();
-          if (fallbackReply) {
-            return NextResponse.json({
-              reply: fallbackReply,
-              usedModel: `${selectedModelBadge} (Backup Router)`
-            });
-          }
-          return NextResponse.json({ error: `AI Engine: ${genData.error.message}` }, { status: 500 });
+        if (!geminiRes.ok || !geminiRes.body) {
+          continue;
         }
 
-        const reply = genData.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (reply) {
-          return NextResponse.json({ reply, usedModel: selectedModelBadge });
-        }
-      } catch (geminiErr) {
-        console.warn('Gemini call failed, trying backup...', geminiErr);
-        const fallbackReply = await queryOpenRouter();
-        if (fallbackReply) {
-          return NextResponse.json({
-            reply: fallbackReply,
-            usedModel: `${selectedModelBadge} (Backup Router)`
-          });
-        }
+        const encoder = new TextEncoder();
+        const decoder = new TextDecoder();
+
+        const transformStream = new ReadableStream({
+          async start(controller) {
+            const reader = geminiRes.body!.getReader();
+            let buffer = '';
+
+            try {
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop() || '';
+
+                for (const line of lines) {
+                  const trimmed = line.trim();
+                  if (trimmed.startsWith('data: ')) {
+                    const jsonStr = trimmed.replace('data: ', '').trim();
+                    try {
+                      const parsed = JSON.parse(jsonStr);
+                      const text = parsed.candidates?.[0]?.content?.parts?.[0]?.text;
+                      if (text) {
+                        controller.enqueue(encoder.encode(text));
+                      }
+                    } catch {
+                      // Skip invalid chunks
+                    }
+                  }
+                }
+              }
+            } catch (err) {
+              controller.error(err);
+            } finally {
+              controller.close();
+            }
+          },
+        });
+
+        return new Response(transformStream, {
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            'Transfer-Encoding': 'chunked',
+          },
+        });
+      } catch (err) {
+        console.warn(`Key ...${key.slice(-4)} stream error. Rotating...`);
       }
     }
 
-    // 2. Final Fallback Attempt
-    const fallbackReply = await queryOpenRouter();
-    if (fallbackReply) {
-      return NextResponse.json({
-        reply: fallbackReply,
-        usedModel: `${selectedModelBadge} (Backup Engine)`
-      });
-    }
-
-    return NextResponse.json({ error: 'All AI services are currently busy. Please try again.' }, { status: 500 });
-
+    return new Response(JSON.stringify({ error: 'All AI models are currently busy. Please retry.' }), { status: 503 });
   } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Internal Server Error' },
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), { status: 500 });
   }
 }
