@@ -319,8 +319,13 @@ export default function ChatDashboard() {
     setAttachedFiles([]);
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
 
-    const newMessages: Message[] = [...messages, { role: 'user', content: textToSend, files: userFiles }];
-    setMessages(newMessages);
+    const deskLabel = activeMode === 'admission_kd' ? 'KD Admission Desk' : 'Student Assistant Desk';
+
+    setMessages((prev) => [
+      ...prev,
+      { role: 'user', content: textToSend, files: userFiles },
+      { role: 'assistant', content: '', serviceTitle: deskLabel },
+    ]);
     setLoading(true);
 
     try {
@@ -344,7 +349,7 @@ export default function ChatDashboard() {
       if (currentConvoId) {
         await supabase
           .from('messages')
-          .insert([{ conversation_id: currentConvoId, role: 'user', content: textToSend || `[Attached: ${userFiles.map(f => f.name).join(', ')}]` }]);
+          .insert([{ conversation_id: currentConvoId, role: 'user', content: textToSend || `[Attached: ${userFiles.map((f) => f.name).join(', ')}]` }]);
       }
 
       const res = await fetch('/api/chat', {
@@ -362,38 +367,47 @@ export default function ChatDashboard() {
         }),
       });
 
-      const data = await res.json();
-
-      if (!res.ok || data.error) {
-        throw new Error(data.error || `HTTP ${res.status}`);
+      if (!res.ok || !res.body) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `HTTP ${res.status}`);
       }
 
-      const deskLabel = activeMode === 'admission_kd' ? 'KD Admission Desk' : 'Student Assistant Desk';
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let fullResponse = '';
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: data.reply,
-          serviceTitle: deskLabel,
-        },
-      ]);
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
 
-      if (currentConvoId) {
+        const chunk = decoder.decode(value, { stream: true });
+        fullResponse += chunk;
+
+        setMessages((prev) => {
+          const updated = [...prev];
+          const lastMsg = updated[updated.length - 1];
+          if (lastMsg && lastMsg.role === 'assistant') {
+            lastMsg.content = fullResponse;
+          }
+          return updated;
+        });
+      }
+
+      if (currentConvoId && fullResponse) {
         await supabase
           .from('messages')
-          .insert([{ conversation_id: currentConvoId, role: 'assistant', content: data.reply, used_model: deskLabel }]);
+          .insert([{ conversation_id: currentConvoId, role: 'assistant', content: fullResponse, used_model: deskLabel }]);
       }
-
     } catch (err: any) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: `Connection error: ${err.message}`,
-          serviceTitle: 'System Help',
-        },
-      ]);
+      setMessages((prev) => {
+        const updated = [...prev];
+        const lastMsg = updated[updated.length - 1];
+        if (lastMsg && lastMsg.role === 'assistant') {
+          lastMsg.content = `Connection error: ${err.message}`;
+          lastMsg.serviceTitle = 'System Help';
+        }
+        return updated;
+      });
     } finally {
       setLoading(false);
     }
@@ -705,61 +719,63 @@ export default function ChatDashboard() {
                       </span>
                     )}
                     <div className="max-w-full bg-white border border-slate-200 rounded-2xl p-4 text-slate-800 text-[14px] leading-relaxed pr-4 overflow-x-auto w-full shadow-xs">
-                      <ReactMarkdown 
-                        remarkPlugins={[remarkGfm]}
-                        components={{
-                          table: ({node, ...props}) => (
-                            <table className="border-collapse border border-slate-300 my-3 text-xs w-full text-left bg-white" {...props} />
-                          ),
-                          th: ({node, ...props}) => (
-                            <th className="border border-slate-300 bg-slate-100 px-3 py-2 font-semibold text-slate-900" {...props} />
-                          ),
-                          td: ({node, ...props}) => (
-                            <td className="border border-slate-200 px-3 py-1.5 text-slate-700" {...props} />
-                          ),
-                          p: ({node, ...props}) => <p className="mb-2.5 last:mb-0" {...props} />,
-                          ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-2.5 space-y-1" {...props} />,
-                          ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-2.5 space-y-1" {...props} />,
-                          code: ({node, ...props}) => (
-                            <code className="bg-slate-100 text-indigo-700 px-1.5 py-0.5 rounded font-mono text-xs border border-slate-200" {...props} />
-                          ),
-                        }}
-                      >
-                        {msg.content}
-                      </ReactMarkdown>
+                      {msg.content ? (
+                        <ReactMarkdown 
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            table: ({node, ...props}) => (
+                              <table className="border-collapse border border-slate-300 my-3 text-xs w-full text-left bg-white" {...props} />
+                            ),
+                            th: ({node, ...props}) => (
+                              <th className="border border-slate-300 bg-slate-100 px-3 py-2 font-semibold text-slate-900" {...props} />
+                            ),
+                            td: ({node, ...props}) => (
+                              <td className="border border-slate-200 px-3 py-1.5 text-slate-700" {...props} />
+                            ),
+                            p: ({node, ...props}) => <p className="mb-2.5 last:mb-0" {...props} />,
+                            ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-2.5 space-y-1" {...props} />,
+                            ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-2.5 space-y-1" {...props} />,
+                            code: ({node, ...props}) => (
+                              <code className="bg-slate-100 text-indigo-700 px-1.5 py-0.5 rounded font-mono text-xs border border-slate-200" {...props} />
+                            ),
+                          }}
+                        >
+                          {msg.content}
+                        </ReactMarkdown>
+                      ) : (
+                        <div className="flex items-center gap-2 text-slate-400 text-xs py-1">
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-[#003366]" />
+                          <span>Streaming answer...</span>
+                        </div>
+                      )}
                     </div>
 
-                    <div className="flex items-center gap-2 mt-1.5 pt-1">
-                      <button
-                        type="button"
-                        onClick={() => copyMessageContent(msg.content, index)}
-                        className="flex items-center gap-1 text-[11px] text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-200 px-2 py-1 rounded-md transition cursor-pointer shadow-xs"
-                        title="Copy answer"
-                      >
-                        {copiedIndex === index ? (
-                          <>
-                            <Check className="w-3 h-3 text-emerald-600" />
-                            <span className="text-emerald-600 font-medium">Copied</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3 h-3" />
-                            <span>Copy</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
+                    {msg.content && (
+                      <div className="flex items-center gap-2 mt-1.5 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => copyMessageContent(msg.content, index)}
+                          className="flex items-center gap-1 text-[11px] text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-200 px-2 py-1 rounded-md transition cursor-pointer shadow-xs"
+                          title="Copy answer"
+                        >
+                          {copiedIndex === index ? (
+                            <>
+                              <Check className="w-3 h-3 text-emerald-600" />
+                              <span className="text-emerald-600 font-medium">Copied</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3" />
+                              <span>Copy</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             ))}
-
-            {loading && (
-              <div className="flex items-center gap-2 text-slate-500 text-xs py-2">
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-[#003366]" />
-                <span>Preparing response...</span>
-              </div>
-            )}
           </div>
 
           {userPromptIndices.length > 1 && (
