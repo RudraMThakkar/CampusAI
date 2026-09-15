@@ -18,7 +18,9 @@ type Language = 'en' | 'gu' | 'hi';
 interface AttachedFile {
   name: string;
   type: string;
+  mimeType: string;
   size: string;
+  data?: string;
 }
 
 interface Message {
@@ -40,7 +42,6 @@ export default function ChatDashboard() {
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
 
-  // Rename conversation state
   const [editingChatId, setEditingChatId] = useState<string | null>(null);
   const [editTitleInput, setEditTitleInput] = useState('');
 
@@ -269,17 +270,37 @@ export default function ChatDashboard() {
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    const newFiles: AttachedFile[] = Array.from(files).map((f) => ({
-      name: f.name,
-      type: f.type.startsWith('image/') ? 'image' : 'doc',
-      size: `${(f.size / (1024 * 1024)).toFixed(1)} MB`
-    }));
+    const fileList = Array.from(files);
+    const processedFiles: AttachedFile[] = [];
 
-    setAttachedFiles((prev) => [...prev, ...newFiles]);
+    for (const file of fileList) {
+      const base64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const res = (reader.result as string) || '';
+          const base64Data = res.split(',')[1] || '';
+          resolve(base64Data);
+        };
+        reader.readAsDataURL(file);
+      });
+
+      const actualMime = file.type || (file.name.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg');
+
+      processedFiles.push({
+        name: file.name,
+        type: file.type.startsWith('image/') ? 'image' : 'doc',
+        mimeType: actualMime,
+        size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+        data: base64,
+      });
+    }
+
+    setAttachedFiles((prev) => [...prev, ...processedFiles]);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const removeFile = (index: number) => {
@@ -306,7 +327,7 @@ export default function ChatDashboard() {
       let currentConvoId = activeConversationId;
 
       if (!currentConvoId && userId) {
-        const titleSnippet = textToSend.slice(0, 28) || 'New Query';
+        const titleSnippet = textToSend.slice(0, 28) || (userFiles[0]?.name.slice(0, 28) ?? 'Document Inquiry');
         const { data: newConvo } = await supabase
           .from('conversations')
           .insert([{ user_id: userId, title: titleSnippet, mode: activeMode }])
@@ -323,7 +344,7 @@ export default function ChatDashboard() {
       if (currentConvoId) {
         await supabase
           .from('messages')
-          .insert([{ conversation_id: currentConvoId, role: 'user', content: textToSend }]);
+          .insert([{ conversation_id: currentConvoId, role: 'user', content: textToSend || `[Attached: ${userFiles.map(f => f.name).join(', ')}]` }]);
       }
 
       const res = await fetch('/api/chat', {
@@ -333,6 +354,11 @@ export default function ChatDashboard() {
           message: textToSend,
           mode: activeMode,
           language: lang,
+          files: userFiles.map((f) => ({
+            name: f.name,
+            type: f.mimeType,
+            data: f.data,
+          })),
         }),
       });
 
@@ -604,7 +630,6 @@ export default function ChatDashboard() {
         <div className="flex-1 relative overflow-hidden flex">
           <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 max-w-3xl w-full mx-auto scroll-smooth">
             
-            {/* Quick Action Cards on Empty/Initial Chat */}
             {messages.length === 1 && (
               <div className="pt-2 pb-4">
                 <div className="text-center mb-6">
