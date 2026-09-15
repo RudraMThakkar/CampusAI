@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import MermaidChart from '@/components/MermaidChart';
 import { 
   Plus, MessageSquare, LogOut, PanelLeftClose, PanelLeft, ArrowUp, 
   FileText, Image as ImageIcon, X, Loader2,
@@ -105,7 +106,6 @@ export default function ChatDashboard() {
     }
   ];
 
-  // Auto-scroll anchor
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
@@ -387,14 +387,12 @@ export default function ChatDashboard() {
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       
-      // Smooth Queue-based Typewriter Mechanism
       let tokenQueue = '';
       let displayedContent = '';
       let isReading = true;
 
       const typeInterval = setInterval(() => {
         if (tokenQueue.length > 0) {
-          // Take 2-3 characters at a time for smooth, natural cadence
           const chunk = tokenQueue.slice(0, 3);
           tokenQueue = tokenQueue.slice(3);
           displayedContent += chunk;
@@ -417,7 +415,7 @@ export default function ChatDashboard() {
           }
           setLoading(false);
         }
-      }, 18); // 18ms smooth typewriter pacing
+      }, 18);
 
       while (true) {
         const { done, value } = await reader.read();
@@ -764,9 +762,20 @@ export default function ChatDashboard() {
                             p: ({node, ...props}) => <p className="mb-2.5 last:mb-0" {...props} />,
                             ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-2.5 space-y-1" {...props} />,
                             ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-2.5 space-y-1" {...props} />,
-                            code: ({node, ...props}) => (
-                              <code className="bg-slate-100 text-indigo-700 px-1.5 py-0.5 rounded font-mono text-xs border border-slate-200" {...props} />
-                            ),
+                            code: ({node, inline, className, children, ...props}: any) => {
+                              const match = /language-(\w+)/.exec(className || '');
+                              const codeString = String(children).replace(/\n$/, '');
+
+                              if (!inline && match && match[1] === 'mermaid') {
+                                return <MermaidChart chart={codeString} />;
+                              }
+
+                              return (
+                                <code className="bg-slate-100 text-indigo-700 px-1.5 py-0.5 rounded font-mono text-xs border border-slate-200" {...props}>
+                                  {children}
+                                </code>
+                              );
+                            },
                           }}
                         >
                           {msg.content}
