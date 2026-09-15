@@ -7,7 +7,8 @@ import {
   Plus, MessageSquare, LogOut, PanelLeftClose, PanelLeft, ArrowUp, 
   FileText, Image as ImageIcon, X, Loader2,
   GraduationCap, HelpCircle,
-  Languages, Copy, Check, Share2
+  Languages, Copy, Check, Share2,
+  Trash2, Edit2
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -39,8 +40,12 @@ export default function ChatDashboard() {
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
 
+  // Rename conversation state
+  const [editingChatId, setEditingChatId] = useState<string | null>(null);
+  const [editTitleInput, setEditTitleInput] = useState('');
+
   const [selectedMode, setSelectedMode] = useState<ServiceMode>('admission_kd');
-  const [lang, setLang] = useState<Language>('en'); // Default set to English
+  const [lang, setLang] = useState<Language>('en');
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     { 
@@ -64,7 +69,7 @@ export default function ChatDashboard() {
   const langNames: Record<Language, { label: string; native: string }> = {
     en: { label: 'English', native: 'EN' },
     gu: { label: 'ગુજરાતી', native: 'ગુજ' },
-    hi: { label: 'हिंदी', native: 'हिं' }
+    hi: { label: 'हिंदी', native: 'हिં' }
   };
 
   useEffect(() => {
@@ -137,6 +142,62 @@ export default function ChatDashboard() {
     ]);
     setAttachedFiles([]);
     setInput('');
+  };
+
+  // --- DELETE CONVERSATION ---
+  const handleDeleteConversation = async (e: React.MouseEvent, convoId: string) => {
+    e.stopPropagation();
+    if (!window.confirm('Delete this conversation permanently?')) return;
+
+    try {
+      // 1. Delete messages linked to conversation
+      await supabase.from('messages').delete().eq('conversation_id', convoId);
+      // 2. Delete conversation record
+      const { error } = await supabase.from('conversations').delete().eq('id', convoId);
+
+      if (!error) {
+        setConversations((prev) => prev.filter((c) => c.id !== convoId));
+        if (activeConversationId === convoId) {
+          startNewChat();
+        }
+      }
+    } catch (err) {
+      console.error('Error deleting conversation:', err);
+    }
+  };
+
+  // --- RENAME CONVERSATION ---
+  const startRenaming = (e: React.MouseEvent, convo: ConversationItem) => {
+    e.stopPropagation();
+    setEditingChatId(convo.id);
+    setEditTitleInput(convo.title);
+  };
+
+  const handleSaveRename = async (e: React.FormEvent | React.FocusEvent, convoId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const trimmed = editTitleInput.trim();
+    if (!trimmed) {
+      setEditingChatId(null);
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('conversations')
+        .update({ title: trimmed, updated_at: new Date().toISOString() })
+        .eq('id', convoId);
+
+      if (!error) {
+        setConversations((prev) =>
+          prev.map((c) => (c.id === convoId ? { ...c, title: trimmed } : c))
+        );
+      }
+    } catch (err) {
+      console.error('Error renaming conversation:', err);
+    } finally {
+      setEditingChatId(null);
+    }
   };
 
   const copyMessageContent = (text: string, index: number) => {
@@ -354,16 +415,60 @@ export default function ChatDashboard() {
               <p className="text-[11px] text-slate-300 px-2 py-1 italic">No previous chats</p>
             ) : (
               conversations.map((convo) => (
-                <button 
+                <div 
                   key={convo.id}
                   onClick={() => loadConversationMessages(convo.id, convo.mode)}
-                  className={`flex items-center gap-2.5 text-left text-xs px-2.5 py-2 rounded-lg group transition cursor-pointer ${
+                  className={`flex items-center justify-between text-left text-xs px-2.5 py-2 rounded-lg group transition cursor-pointer ${
                     activeConversationId === convo.id ? 'bg-[#184877] text-white font-medium border border-slate-600' : 'text-slate-200 hover:text-white hover:bg-[#13395e]/80'
                   }`}
                 >
-                  <MessageSquare className="w-3.5 h-3.5 flex-shrink-0 text-slate-300 group-hover:text-amber-300" />
-                  <span className="truncate">{convo.title}</span>
-                </button>
+                  {editingChatId === convo.id ? (
+                    <form 
+                      onSubmit={(e) => handleSaveRename(e, convo.id)} 
+                      className="flex-1 mr-1"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <input
+                        type="text"
+                        autoFocus
+                        value={editTitleInput}
+                        onChange={(e) => setEditTitleInput(e.target.value)}
+                        onBlur={(e) => handleSaveRename(e, convo.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') setEditingChatId(null);
+                        }}
+                        className="w-full bg-[#0b2545] border border-amber-400 text-white text-xs px-1.5 py-0.5 rounded focus:outline-none"
+                      />
+                    </form>
+                  ) : (
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <MessageSquare className="w-3.5 h-3.5 flex-shrink-0 text-slate-300 group-hover:text-amber-300" />
+                      <span className="truncate">{convo.title}</span>
+                    </div>
+                  )}
+
+                  {/* Actions on Hover */}
+                  {editingChatId !== convo.id && (
+                    <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity flex-shrink-0 ml-1">
+                      <button
+                        type="button"
+                        onClick={(e) => startRenaming(e, convo)}
+                        title="Rename Chat"
+                        className="p-1 hover:bg-[#0b2545] rounded text-slate-300 hover:text-amber-300 transition"
+                      >
+                        <Edit2 className="w-3 h-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => handleDeleteConversation(e, convo.id)}
+                        title="Delete Chat"
+                        className="p-1 hover:bg-[#0b2545] rounded text-slate-300 hover:text-rose-400 transition"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               ))
             )}
           </div>
