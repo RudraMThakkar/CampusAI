@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import MermaidChart from '@/components/MermaidChart';
 import { 
   Plus, MessageSquare, LogOut, PanelLeftClose, PanelLeft, ArrowUp, 
@@ -38,7 +39,6 @@ interface ConversationItem {
   created_at: string;
 }
 
-// Complete UI Translations Dictionary
 const UI_TEXT = {
   en: {
     appTitle: 'K.D. Polytechnic AI',
@@ -56,9 +56,9 @@ const UI_TEXT = {
     copied: 'Copied',
     welcomeTitle: 'K.D. Polytechnic Patan Academic Portal',
     welcomeSubtitle: 'Select a frequently asked inquiry below or type your questions regarding admission, scholarships, and GTU exams.',
-    inputPlaceholderAdmission: 'Ask about admission procedure, ACPDC merit, eligibility, or hostel...',
-    inputPlaceholderStudent: 'Ask about scholarships, GTU exam forms, syllabus, or circulars...',
-    footerNote: 'Kilachand Devchand Polytechnic, Patan • GTU Affiliated Government Institute Helpdesk',
+    inputPlaceholderAdmission: 'Ask about admission, merit, fees...',
+    inputPlaceholderStudent: 'Ask about scholarships, GTU exams, syllabus...',
+    footerNote: 'Kilachand Devchand Polytechnic, Patan • GTU Affiliated Helpdesk',
     generating: 'Generating response...',
     card1Title: 'ACPDC Admission & Merit',
     card1Desc: 'Eligibility, 10th cut-offs, and seat matrix for Diploma Computer Engineering.',
@@ -90,9 +90,9 @@ const UI_TEXT = {
     copied: 'કૉપિ થઈ ગયું',
     welcomeTitle: 'કે.ડી. પોલિટેકનિક પાટણ શૈક્ષણિક પોર્ટલ',
     welcomeSubtitle: 'નીચે આપેલા મહત્વના પ્રશ્નોમાંથી પસંદ કરો અથવા પ્રવેશ, શિષ્યવૃત્તિ અને જીટીયુ પરીક્ષા સંબંધિત પ્રશ્નો પૂછો.',
-    inputPlaceholderAdmission: 'પ્રવેશ પ્રક્રિયા, ACPDC મેરિટ, લાયકાત અથવા હોસ્ટેલ વિશે પૂછો...',
-    inputPlaceholderStudent: 'શિષ્યવૃત્તિ (MYSY), GTU પરીક્ષા ફોર્મ, અભ્યાસક્રમ અથવા પરિપત્રો વિશે પૂછો...',
-    footerNote: 'કિલાચંદ દેવચંદ પોલિટેકનિક, પાટણ • GTU સંલગ્ન સરકારી ઇન્સ્ટિટ્યૂટ હેલ્પડેસ્ક',
+    inputPlaceholderAdmission: 'પ્રવેશ પ્રક્રિયા, મેરિટ, ફી વિશે પૂછો...',
+    inputPlaceholderStudent: 'શિષ્યવૃત્તિ (MYSY), GTU પરીક્ષા, સિલેબસ વિશે પૂછો...',
+    footerNote: 'કિલાચંદ દેવચંદ પોલિટેકનિક, પાટણ • GTU સંલગ્ન હેલ્પડેસ્ક',
     generating: 'જવાબ તૈયાર થઈ રહ્યો છે...',
     card1Title: 'ACPDC પ્રવેશ અને મેરિટ',
     card1Desc: 'ડિપ્લોમા કમ્પ્યુટર એન્જિનિયરિંગ માટે લાયકાત, ૧૦મા પછીના કટ-ઓફ અને બેઠકોની વિગત.',
@@ -124,9 +124,9 @@ const UI_TEXT = {
     copied: 'कॉपी हुआ',
     welcomeTitle: 'के.डी. पॉलिटेक्निक पाटन शैक्षणिक पोर्टल',
     welcomeSubtitle: 'नीचे दिए गए महत्वपूर्ण प्रश्नों में से चुनें या प्रवेश, छात्रवृत्ति और जीटीयू परीक्षा संबंधी प्रश्न पूछें।',
-    inputPlaceholderAdmission: 'प्रवेश प्रक्रिया, ACPDC मेरिट, योग्यता या हॉस्टल के बारे में पूछें...',
-    inputPlaceholderStudent: 'छात्रवृत्ति (MYSY), GTU परीक्षा फॉर्म, पाठ्यक्रम या परिपत्रों के बारे में पूछें...',
-    footerNote: 'किलाचंद देवचंद पॉलिटेक्निक, पाटन • GTU संबद्ध सरकारी संस्थान हेल्पडेस्क',
+    inputPlaceholderAdmission: 'प्रवेश प्रक्रिया, मेरिट, फीस के बारे में पूछें...',
+    inputPlaceholderStudent: 'छात्रवृत्ति (MYSY), GTU परीक्षा, सिलेबस के बारे में पूछें...',
+    footerNote: 'किलाचंद देवचंद पॉलिटेक्निक, पाटन • GTU संबद्ध हेल्पडेस्क',
     generating: 'उत्तर तैयार हो रहा है...',
     card1Title: 'ACPDC प्रवेश और मेरिट',
     card1Desc: 'डिप्लोमा कंप्यूटर इंजीनियरिंग के लिए पात्रता, 10वीं के कट-ऑफ और सीटों का विवरण।',
@@ -166,7 +166,7 @@ export default function ChatDashboard() {
     }
   ]);
   const [input, setInput] = useState('');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
@@ -184,7 +184,7 @@ export default function ChatDashboard() {
   const langNames: Record<Language, { label: string; native: string }> = {
     en: { label: 'English', native: 'EN' },
     gu: { label: 'ગુજરાતી', native: 'ગુજ' },
-    hi: { label: 'हिंदी', native: 'हिं' }
+    hi: { label: 'हिंदी', native: 'हिં' }
   };
 
   const actionCards = [
@@ -218,6 +218,12 @@ export default function ChatDashboard() {
     }
   ];
 
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+      setIsSidebarOpen(true);
+    }
+  }, []);
+
   const scrollToBottom = (force = false) => {
     if (!chatContainerRef.current) return;
     if (force || !isUserScrolledUpRef.current) {
@@ -229,7 +235,7 @@ export default function ChatDashboard() {
     if (!chatContainerRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
     const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-    isUserScrolledUpRef.current = distanceFromBottom > 120;
+    isUserScrolledUpRef.current = distanceFromBottom > 100;
   };
 
   const handleUserWheel = (e: React.WheelEvent) => {
@@ -272,12 +278,16 @@ export default function ChatDashboard() {
         setConversations(data);
       }
     } catch (err) {
-      console.warn('Failed to load conversations from Supabase:', err);
+      console.warn('Failed to load conversations:', err);
     }
   };
 
   const loadConversationMessages = async (convoId: string, convoMode?: string) => {
     if (isGuest) return;
+
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setIsSidebarOpen(false);
+    }
 
     try {
       setActiveConversationId(convoId);
@@ -287,7 +297,7 @@ export default function ChatDashboard() {
 
       const { data, error } = await supabase
         .from('messages')
-        .select('id, role, content, used_model')
+        .select('id, role, content')
         .eq('conversation_id', convoId)
         .order('created_at', { ascending: true });
 
@@ -296,11 +306,11 @@ export default function ChatDashboard() {
           data.map((m: any) => ({
             role: m.role,
             content: m.content,
-            serviceTitle: m.used_model,
+            serviceTitle: m.role === 'assistant' ? (convoMode === 'admission_kd' ? t.admissionDesk : t.studentAssistant) : undefined,
           }))
         );
         isUserScrolledUpRef.current = false;
-        setTimeout(() => scrollToBottom(true), 50);
+        setTimeout(() => scrollToBottom(true), 60);
       }
     } catch (err) {
       console.warn('Failed to load messages:', err);
@@ -318,6 +328,9 @@ export default function ChatDashboard() {
     setAttachedFiles([]);
     setInput('');
     isUserScrolledUpRef.current = false;
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setIsSidebarOpen(false);
+    }
   };
 
   const handleDeleteConversation = async (e: React.MouseEvent, convoId: string) => {
@@ -415,7 +428,7 @@ export default function ChatDashboard() {
     setInput(e.target.value);
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 180)}px`;
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 140)}px`;
     }
   };
 
@@ -437,7 +450,7 @@ export default function ChatDashboard() {
         reader.readAsDataURL(file);
       });
 
-      const actualMime = file.type || (file.name.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg');
+      const actualMime = file.type || (file.name?.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/jpeg');
 
       processedFiles.push({
         name: file.name,
@@ -483,27 +496,30 @@ export default function ChatDashboard() {
     try {
       let currentConvoId = activeConversationId;
 
+      // 1. Create Conversation in Supabase if not present
       if (!isGuest && !currentConvoId && userId) {
-        const titleSnippet = textToSend.slice(0, 28) || (userFiles[0]?.name.slice(0, 28) ?? 'Document Inquiry');
-        const { data: newConvo } = await supabase
+        const titleSnippet = textToSend.slice(0, 26) || (userFiles[0]?.name.slice(0, 26) ?? 'Inquiry');
+        const { data: newConvo, error: convoErr } = await supabase
           .from('conversations')
           .insert([{ user_id: userId, title: titleSnippet, mode: activeMode }])
           .select()
           .single();
 
-        if (newConvo?.id) {
+        if (!convoErr && newConvo?.id) {
           currentConvoId = newConvo.id;
           setActiveConversationId(currentConvoId);
           fetchConversations(userId);
         }
       }
 
+      // 2. Save User Message
       if (!isGuest && currentConvoId) {
         await supabase
           .from('messages')
           .insert([{ conversation_id: currentConvoId, role: 'user', content: textToSend || `[Attached: ${userFiles.map((f) => f.name).join(', ')}]` }]);
       }
 
+      // 3. Request API Stream
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -527,21 +543,22 @@ export default function ChatDashboard() {
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       
+      let fullAssistantText = '';
       let tokenQueue = '';
-      let displayedContent = '';
       let isReading = true;
 
-      const typeInterval = setInterval(() => {
+      // Typewriter interval for silky streaming animation
+      const typeInterval = setInterval(async () => {
         if (tokenQueue.length > 0) {
-          const chunk = tokenQueue.slice(0, 3);
-          tokenQueue = tokenQueue.slice(3);
-          displayedContent += chunk;
+          const chunk = tokenQueue.slice(0, 4);
+          tokenQueue = tokenQueue.slice(4);
+          fullAssistantText += chunk;
 
           setMessages((prev) => {
             const updated = [...prev];
             const lastMsg = updated[updated.length - 1];
             if (lastMsg && lastMsg.role === 'assistant') {
-              lastMsg.content = displayedContent;
+              lastMsg.content = fullAssistantText;
             }
             return updated;
           });
@@ -549,15 +566,32 @@ export default function ChatDashboard() {
           scrollToBottom(false);
         } else if (!isReading) {
           clearInterval(typeInterval);
-          if (!isGuest && currentConvoId && displayedContent) {
-            supabase
-              .from('messages')
-              .insert([{ conversation_id: currentConvoId, role: 'assistant', content: displayedContent, used_model: deskLabel }]);
-          }
           setLoading(false);
-        }
-      }, 18);
 
+          // 4. Save Assistant Response in Supabase (100% Reliable without custom columns)
+          if (!isGuest && currentConvoId && fullAssistantText.trim()) {
+            try {
+              const { error: saveErr } = await supabase
+                .from('messages')
+                .insert([{ 
+                  conversation_id: currentConvoId, 
+                  role: 'assistant', 
+                  content: fullAssistantText.trim() 
+                }]);
+
+              if (saveErr) {
+                console.error('Supabase assistant message save error:', saveErr);
+              } else {
+                console.log('Assistant message successfully saved in Supabase.');
+              }
+            } catch (dbErr) {
+              console.error('DB Insert Exception:', dbErr);
+            }
+          }
+        }
+      }, 16);
+
+      // Read response stream
       while (true) {
         const { done, value } = await reader.read();
         if (done) {
@@ -602,10 +636,28 @@ export default function ChatDashboard() {
     .map((msg, index) => (msg.role === 'user' ? index : null))
     .filter((val): val is number => val !== null);
 
+  // Show action cards ONLY if this is a fresh new chat without conversation ID
+  const isFreshNewChat = !activeConversationId && messages.length === 1 && messages[0].role === 'assistant';
+
   return (
-    <div className="flex h-screen w-full bg-slate-100 text-slate-800 font-sans antialiased">
+    <div className="flex h-[100dvh] w-full bg-slate-100 text-slate-800 font-sans antialiased overflow-hidden relative">
+      
+      {/* Mobile Backdrop Overlay */}
+      {isSidebarOpen && (
+        <div 
+          onClick={() => setIsSidebarOpen(false)}
+          className="fixed inset-0 bg-slate-900/60 z-30 md:hidden backdrop-blur-xs transition-opacity"
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className={`${isSidebarOpen ? 'w-64' : 'w-0'} transition-all duration-200 border-r border-[#13395e] bg-[#0b2545] text-slate-100 flex flex-col justify-between overflow-hidden flex-shrink-0 shadow-lg`}>
+      <aside className={`
+        fixed md:static inset-y-0 left-0 z-40
+        ${isSidebarOpen ? 'w-64 translate-x-0' : 'w-0 -translate-x-full md:translate-x-0'} 
+        transition-all duration-200 ease-in-out
+        border-r border-[#13395e] bg-[#0b2545] text-slate-100 
+        flex flex-col justify-between overflow-hidden flex-shrink-0 shadow-xl md:shadow-lg
+      `}>
         <div className="p-3 flex flex-col gap-3 min-w-[16rem] overflow-y-auto">
           <div className="flex items-center justify-between px-2 pt-1">
             <span className="font-bold text-sm tracking-wide text-white flex items-center gap-2">
@@ -623,24 +675,27 @@ export default function ChatDashboard() {
           {isGuest && (
             <div className="flex items-center gap-2 bg-amber-500/15 border border-amber-400/30 text-amber-300 px-2.5 py-1.5 rounded-lg text-[11px] font-medium">
               <UserCheck className="w-3.5 h-3.5 flex-shrink-0" />
-              <span>{t.guestBanner}</span>
+              <span className="truncate">{t.guestBanner}</span>
             </div>
           )}
 
           <button 
             onClick={startNewChat}
-            className="flex items-center gap-2 w-full py-2 px-3 rounded-lg border border-amber-500/30 bg-[#13395e] hover:bg-[#184877] text-white text-xs font-semibold transition cursor-pointer shadow-sm"
+            className="flex items-center gap-2 w-full py-2.5 px-3 rounded-xl border border-amber-500/30 bg-[#13395e] hover:bg-[#184877] text-white text-xs font-semibold transition cursor-pointer shadow-sm"
           >
             <Plus className="w-3.5 h-3.5 text-amber-300" />
             <span>{t.newChat}</span>
           </button>
 
           <div className="mt-2 flex flex-col gap-1">
-            <div className="text-[11px] font-semibold text-slate-300 px-2 py-1 uppercase tracking-wider">{t.campusServices}</div>
+            <div className="text-[10px] font-semibold text-slate-300 px-2 py-1 uppercase tracking-wider">{t.campusServices}</div>
             
             <button 
-              onClick={() => setSelectedMode('admission_kd')}
-              className={`flex items-center gap-2.5 text-left text-xs px-2.5 py-2 rounded-lg transition cursor-pointer ${
+              onClick={() => {
+                setSelectedMode('admission_kd');
+                if (typeof window !== 'undefined' && window.innerWidth < 768) setIsSidebarOpen(false);
+              }}
+              className={`flex items-center gap-2.5 text-left text-xs px-2.5 py-2.5 rounded-xl transition cursor-pointer ${
                 selectedMode === 'admission_kd' ? 'bg-[#184877] text-amber-300 font-bold border border-amber-400/30' : 'text-slate-200 hover:bg-[#13395e]'
               }`}
             >
@@ -649,8 +704,11 @@ export default function ChatDashboard() {
             </button>
 
             <button 
-              onClick={() => setSelectedMode('student_assistant')}
-              className={`flex items-center gap-2.5 text-left text-xs px-2.5 py-2 rounded-lg transition cursor-pointer ${
+              onClick={() => {
+                setSelectedMode('student_assistant');
+                if (typeof window !== 'undefined' && window.innerWidth < 768) setIsSidebarOpen(false);
+              }}
+              className={`flex items-center gap-2.5 text-left text-xs px-2.5 py-2.5 rounded-xl transition cursor-pointer ${
                 selectedMode === 'student_assistant' ? 'bg-[#184877] text-amber-300 font-bold border border-amber-400/30' : 'text-slate-200 hover:bg-[#13395e]'
               }`}
             >
@@ -660,7 +718,7 @@ export default function ChatDashboard() {
           </div>
 
           <div className="mt-2 flex flex-col gap-0.5">
-            <div className="text-[11px] font-semibold text-slate-300 px-2 py-1 uppercase tracking-wider">{t.recentConversations}</div>
+            <div className="text-[10px] font-semibold text-slate-300 px-2 py-1 uppercase tracking-wider">{t.recentConversations}</div>
             {isGuest ? (
               <p className="text-[11px] text-slate-400 px-2 py-1 italic">{t.guestNotice}</p>
             ) : conversations.length === 0 ? (
@@ -736,66 +794,69 @@ export default function ChatDashboard() {
         </div>
       </aside>
 
-      {/* Main Container */}
-      <main className="flex-1 flex flex-col h-full relative bg-slate-50 overflow-hidden">
-        <header className="h-14 border-b border-slate-200 bg-white px-4 flex items-center justify-between flex-shrink-0 shadow-xs">
-          <div className="flex items-center gap-2">
-            {!isSidebarOpen && (
-              <button 
-                onClick={() => setIsSidebarOpen(true)}
-                className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer mr-1"
-              >
-                <PanelLeft className="w-4 h-4" />
-              </button>
-            )}
+      {/* Main Screen */}
+      <main className="flex-1 flex flex-col h-full w-full relative bg-slate-50 overflow-hidden">
+        {/* Header */}
+        <header className="h-14 border-b border-slate-200 bg-white px-3 sm:px-4 flex items-center justify-between flex-shrink-0 shadow-xs gap-2">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <button 
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer flex-shrink-0"
+              aria-label="Toggle Navigation Sidebar"
+            >
+              <PanelLeft className="w-4 h-4" />
+            </button>
 
-            <div className="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200">
+            <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200">
               <button
                 type="button"
                 onClick={() => setSelectedMode('admission_kd')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition cursor-pointer ${
+                className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded-md text-[11px] sm:text-xs font-medium transition cursor-pointer ${
                   selectedMode === 'admission_kd'
                     ? 'bg-[#003366] text-white shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <GraduationCap className="w-3.5 h-3.5" />
-                <span>{t.admissionDesk}</span>
+                <GraduationCap className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="hidden sm:inline">{t.admissionDesk}</span>
+                <span className="sm:hidden">Admission</span>
               </button>
               <button
                 type="button"
                 onClick={() => setSelectedMode('student_assistant')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition cursor-pointer ${
+                className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded-md text-[11px] sm:text-xs font-medium transition cursor-pointer ${
                   selectedMode === 'student_assistant'
                     ? 'bg-[#003366] text-white shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <HelpCircle className="w-3.5 h-3.5" />
-                <span>{t.studentAssistant}</span>
+                <HelpCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="hidden sm:inline">{t.studentAssistant}</span>
+                <span className="sm:hidden">Student</span>
               </button>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 flex-shrink-0">
             <button
               type="button"
               onClick={handleShareChat}
-              className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 px-3 py-1.5 rounded-full text-xs font-medium text-slate-700 transition cursor-pointer"
+              className="flex items-center gap-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 px-2.5 py-1 rounded-full text-xs font-medium text-slate-700 transition cursor-pointer"
               title="Copy share link"
             >
               {sharedCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5 text-slate-500" />}
-              <span>{sharedCopied ? t.copied : t.share}</span>
+              <span className="hidden sm:inline">{sharedCopied ? t.copied : t.share}</span>
             </button>
 
             <div className="relative" ref={langDropdownRef}>
               <button
                 type="button"
                 onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
-                className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 px-3 py-1.5 rounded-full text-xs font-semibold text-slate-800 transition cursor-pointer"
+                className="flex items-center gap-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 px-2.5 py-1 rounded-full text-xs font-semibold text-slate-800 transition cursor-pointer"
               >
                 <Languages className="w-3.5 h-3.5 text-[#003366]" />
-                <span>{langNames[lang].label}</span>
+                <span className="hidden sm:inline">{langNames[lang].label}</span>
+                <span className="sm:hidden">{langNames[lang].native}</span>
               </button>
 
               {isLangDropdownOpen && (
@@ -821,30 +882,30 @@ export default function ChatDashboard() {
           </div>
         </header>
 
-        {/* Message Feed Container */}
+        {/* Messages */}
         <div className="flex-1 relative overflow-hidden flex">
           <div 
             ref={chatContainerRef} 
             onScroll={handleContainerScroll}
             onWheel={handleUserWheel}
             onTouchMove={handleContainerScroll}
-            className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 max-w-3xl w-full mx-auto"
+            className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-6 max-w-3xl w-full mx-auto"
           >
-            {messages.length === 1 && (
+            {isFreshNewChat && (
               <div className="pt-2 pb-4">
-                <div className="text-center mb-6">
-                  <div className="inline-flex p-3 rounded-2xl bg-amber-500/10 text-amber-700 border border-amber-400/30 mb-3">
-                    <GraduationCap className="w-7 h-7 text-[#003366]" />
+                <div className="text-center mb-5 sm:mb-6">
+                  <div className="inline-flex p-2.5 sm:p-3 rounded-2xl bg-amber-500/10 text-amber-700 border border-amber-400/30 mb-2.5">
+                    <GraduationCap className="w-6 h-6 sm:w-7 sm:h-7 text-[#003366]" />
                   </div>
-                  <h3 className="text-base font-bold text-slate-800">
+                  <h3 className="text-sm sm:text-base font-bold text-slate-800">
                     {t.welcomeTitle}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+                  <p className="text-[11px] sm:text-xs text-slate-500 mt-1 max-w-md mx-auto px-2">
                     {t.welcomeSubtitle}
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                   {actionCards.map((card, idx) => {
                     const CardIcon = card.icon;
                     return (
@@ -852,7 +913,7 @@ export default function ChatDashboard() {
                         key={idx}
                         type="button"
                         onClick={() => handleSend(card.query, card.mode)}
-                        className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-white hover:border-[#003366] hover:shadow-md transition text-left cursor-pointer group"
+                        className="flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-white hover:border-[#003366] hover:shadow-xs transition text-left cursor-pointer group"
                       >
                         <div className="p-2 rounded-lg bg-slate-100 text-[#003366] group-hover:bg-[#003366] group-hover:text-white transition flex-shrink-0">
                           <CardIcon className="w-4 h-4" />
@@ -876,22 +937,22 @@ export default function ChatDashboard() {
               <div 
                 key={index} 
                 ref={(el) => { messageRefs.current[index] = el; }}
-                className="space-y-2 scroll-mt-6 group"
+                className="space-y-1.5 sm:space-y-2 scroll-mt-4 group"
               >
                 {msg.role === 'user' ? (
                   <div className="flex flex-col items-end gap-1.5">
                     {msg.files && msg.files.length > 0 && (
-                      <div className="flex flex-wrap gap-2 justify-end">
+                      <div className="flex flex-wrap gap-1.5 justify-end">
                         {msg.files.map((f, fi) => (
                           <div key={fi} className="flex items-center gap-1.5 bg-slate-200 border border-slate-300 text-slate-800 text-xs px-2.5 py-1 rounded-lg">
                             {f.type === 'image' ? <ImageIcon className="w-3.5 h-3.5 text-blue-600" /> : <FileText className="w-3.5 h-3.5 text-amber-600" />}
-                            <span className="max-w-[120px] truncate">{f.name}</span>
+                            <span className="max-w-[100px] sm:max-w-[120px] truncate">{f.name}</span>
                           </div>
                         ))}
                       </div>
                     )}
                     {msg.content && (
-                      <div className="max-w-[80%] bg-[#003366] text-white px-4 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap shadow-xs">
+                      <div className="max-w-[88%] sm:max-w-[80%] bg-[#003366] text-white px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl text-xs sm:text-sm leading-relaxed whitespace-pre-wrap shadow-xs">
                         {msg.content}
                       </div>
                     )}
@@ -899,28 +960,31 @@ export default function ChatDashboard() {
                 ) : (
                   <div className="flex flex-col items-start gap-1">
                     {msg.serviceTitle && (
-                      <span className="text-[11px] text-slate-500 font-medium flex items-center gap-1 mb-1">
+                      <span className="text-[10px] sm:text-[11px] text-slate-500 font-medium flex items-center gap-1 mb-0.5">
                         <GraduationCap className="w-3.5 h-3.5 text-[#003366]" />
                         {msg.serviceTitle}
                       </span>
                     )}
-                    <div className="max-w-full bg-white border border-slate-200 rounded-2xl p-4 text-slate-800 text-[14px] leading-relaxed pr-4 overflow-x-auto w-full shadow-xs">
+                    <div className="max-w-full bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 text-slate-800 text-[13px] sm:text-[14px] leading-relaxed pr-3 sm:pr-4 overflow-x-auto w-full shadow-xs">
                       {msg.content ? (
                         <ReactMarkdown 
                           remarkPlugins={[remarkGfm]}
+                          rehypePlugins={[rehypeRaw]}
                           components={{
                             table: ({node, ...props}) => (
-                              <table className="border-collapse border border-slate-300 my-3 text-xs w-full text-left bg-white" {...props} />
+                              <div className="overflow-x-auto my-3">
+                                <table className="border-collapse border border-slate-300 text-xs w-full text-left bg-white" {...props} />
+                              </div>
                             ),
                             th: ({node, ...props}) => (
                               <th className="border border-slate-300 bg-slate-100 px-3 py-2 font-semibold text-slate-900" {...props} />
                             ),
                             td: ({node, ...props}) => (
-                              <td className="border border-slate-200 px-3 py-1.5 text-slate-700" {...props} />
+                              <td className="border border-slate-200 px-3 py-2 text-slate-700 align-top leading-relaxed" {...props} />
                             ),
-                            p: ({node, ...props}) => <p className="mb-2.5 last:mb-0" {...props} />,
-                            ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-2.5 space-y-1" {...props} />,
-                            ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-2.5 space-y-1" {...props} />,
+                            p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
+                            ul: ({node, ...props}) => <ul className="list-disc pl-4 sm:pl-5 mb-2 space-y-1" {...props} />,
+                            ol: ({node, ...props}) => <ol className="list-decimal pl-4 sm:pl-5 mb-2 space-y-1" {...props} />,
                             code: ({node, inline, className, children, ...props}: any) => {
                               const match = /language-(\w+)/.exec(className || '');
                               const codeString = String(children).replace(/\n$/, '');
@@ -930,7 +994,7 @@ export default function ChatDashboard() {
                               }
 
                               return (
-                                <code className="bg-slate-100 text-indigo-700 px-1.5 py-0.5 rounded font-mono text-xs border border-slate-200" {...props}>
+                                <code className="bg-slate-100 text-indigo-700 px-1 py-0.5 rounded font-mono text-[11px] sm:text-xs border border-slate-200" {...props}>
                                   {children}
                                 </code>
                               );
@@ -948,11 +1012,11 @@ export default function ChatDashboard() {
                     </div>
 
                     {msg.content && (
-                      <div className="flex items-center gap-2 mt-1.5 pt-1">
+                      <div className="flex items-center gap-2 mt-1">
                         <button
                           type="button"
                           onClick={() => copyMessageContent(msg.content, index)}
-                          className="flex items-center gap-1 text-[11px] text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-200 px-2 py-1 rounded-md transition cursor-pointer shadow-xs"
+                          className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md transition cursor-pointer shadow-xs"
                           title="Copy answer"
                         >
                           {copiedIndex === index ? (
@@ -977,7 +1041,7 @@ export default function ChatDashboard() {
           </div>
 
           {userPromptIndices.length > 1 && (
-            <div className="hidden md:flex flex-col items-center justify-center gap-2 pr-3 pl-1 py-4 z-20 select-none">
+            <div className="hidden lg:flex flex-col items-center justify-center gap-2 pr-3 pl-1 py-4 z-20 select-none">
               <div className="bg-white/90 backdrop-blur border border-slate-200 rounded-full py-2 px-1 flex flex-col items-center gap-2 shadow-xs">
                 {userPromptIndices.map((msgIndex, dotIdx) => (
                   <button
@@ -997,15 +1061,15 @@ export default function ChatDashboard() {
           )}
         </div>
 
-        {/* Input Area */}
-        <div className="p-4 bg-transparent max-w-3xl w-full mx-auto flex-shrink-0">
-          <div className="bg-white border border-slate-300 focus-within:border-[#003366] rounded-2xl p-2.5 transition-all shadow-md flex flex-col gap-2">
+        {/* Input */}
+        <div className="p-2 sm:p-4 bg-white sm:bg-transparent max-w-3xl w-full mx-auto flex-shrink-0 border-t sm:border-0 border-slate-200">
+          <div className="bg-white border border-slate-300 focus-within:border-[#003366] rounded-xl sm:rounded-2xl p-2 sm:p-2.5 transition-all shadow-xs sm:shadow-md flex flex-col gap-1.5 sm:gap-2">
             {attachedFiles.length > 0 && (
-              <div className="flex flex-wrap gap-2 px-1 pt-1">
+              <div className="flex flex-wrap gap-1.5 px-1 pt-0.5">
                 {attachedFiles.map((file, idx) => (
-                  <div key={idx} className="flex items-center gap-2 bg-slate-100 border border-slate-200 text-slate-700 text-xs pl-2.5 pr-1.5 py-1 rounded-lg">
-                    {file.type === 'image' ? <ImageIcon className="w-3.5 h-3.5 text-blue-600" /> : <FileText className="w-3.5 h-3.5 text-amber-600" />}
-                    <span className="max-w-[140px] truncate">{file.name}</span>
+                  <div key={idx} className="flex items-center gap-1.5 bg-slate-100 border border-slate-200 text-slate-700 text-[11px] sm:text-xs pl-2 pr-1 py-0.5 rounded-lg">
+                    {file.type === 'image' ? <ImageIcon className="w-3 h-3 text-blue-600" /> : <FileText className="w-3 h-3 text-amber-600" />}
+                    <span className="max-w-[100px] truncate">{file.name}</span>
                     <button onClick={() => removeFile(idx)} className="p-0.5 hover:bg-slate-200 rounded text-slate-400 hover:text-slate-700 cursor-pointer">
                       <X className="w-3 h-3" />
                     </button>
@@ -1025,7 +1089,7 @@ export default function ChatDashboard() {
                   ? t.inputPlaceholderAdmission
                   : t.inputPlaceholderStudent
               }
-              className="w-full bg-transparent px-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none resize-none min-h-[24px] max-h-[180px] leading-relaxed"
+              className="w-full bg-transparent px-1.5 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none resize-none min-h-[20px] max-h-[120px] leading-relaxed"
             />
 
             <div className="flex items-center justify-between pt-1 border-t border-slate-100">
@@ -1041,7 +1105,7 @@ export default function ChatDashboard() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-800 transition cursor-pointer"
+                  className="p-1 sm:p-1.5 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-800 transition cursor-pointer"
                   title="Attach verification documents or forms"
                 >
                   <Plus className="w-4 h-4" />
@@ -1052,13 +1116,13 @@ export default function ChatDashboard() {
                 type="button"
                 onClick={() => handleSend()}
                 disabled={loading || (!input.trim() && attachedFiles.length === 0)}
-                className="h-8 w-8 rounded-xl bg-[#003366] hover:bg-[#002244] disabled:bg-slate-200 text-white disabled:text-slate-400 flex items-center justify-center transition cursor-pointer flex-shrink-0 shadow-xs"
+                className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg sm:rounded-xl bg-[#003366] hover:bg-[#002244] disabled:bg-slate-200 text-white disabled:text-slate-400 flex items-center justify-center transition cursor-pointer flex-shrink-0 shadow-xs"
               >
-                <ArrowUp className="w-4 h-4" />
+                <ArrowUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
             </div>
           </div>
-          <p className="text-[11px] text-center text-slate-500 mt-2">
+          <p className="text-[10px] sm:text-[11px] text-center text-slate-400 sm:text-slate-500 mt-1 sm:mt-2 line-clamp-1">
             {t.footerNote}
           </p>
         </div>

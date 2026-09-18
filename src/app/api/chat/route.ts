@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import PDFParser from 'pdf2json';
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,108 +12,115 @@ export async function POST(req: NextRequest) {
       return new Response(JSON.stringify({ error: 'Message or file is required' }), { status: 400 });
     }
 
-    const openrouterKey = process.env.OPENROUTER_API_KEY;
     const groqKey = process.env.GROQ_API_KEY;
+    const openrouterKey = process.env.OPENROUTER_API_KEY;
 
     // =========================================================================
-    // 0. EXPLICIT IMAGE GENERATION INTERCEPTOR
+    // 1. INSTITUTIONAL GROUND TRUTH
     // =========================================================================
-    const isImageRequest = /(create|generate|make|draw|show)\s+(an?\s+)?(image|picture|photo|diagram|illustration)/i.test(message || '');
-
-    if (isImageRequest && !hasFiles) {
-      const cleanPrompt = encodeURIComponent(
-        (message || '')
-          .replace(/(create|generate|make|draw|show)\s+(an?\s+)?(image|picture|photo|diagram|illustration)\s+(of|explaining|showing)?/gi, '')
-          .trim() || 'academic diagram'
-      );
-
-      const imageUrl = `https://image.pollinations.ai/prompt/detailed%20infographic%20diagram%20of%20${cleanPrompt}%20clean%20educational%20high%20resolution?width=1024&height=600&nologo=true&seed=${Math.floor(Math.random() * 10000)}`;
-
-      const responseMarkdown = `![Generated Diagram](${imageUrl})\n\n### Explanation for ${decodeURIComponent(cleanPrompt)}:\nHere is the visual diagram generated for your request. Dynamic memory allocation allows programs to allocate memory explicitly at runtime from the **Heap** using functions like \`malloc()\`, \`calloc()\`, and release it back to the system using \`free()\`.`;
-
-      return new Response(responseMarkdown, {
-        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-      });
-    }
-
-    let systemContext = 'You are KD Campus AI, the official academic intelligence assistant for Kilachand Devchand (K.D.) Polytechnic, Patan.';
+    let systemContext = `You are KD Campus AI, the official academic intelligence assistant for Kilachand Devchand (K.D.) Polytechnic, Patan (Gujarat).
+STRICT FORMATTING & ACCURACY RULES:
+- Never fabricate admission cut-offs, fee amounts, or GTU regulations.
+- For checklists, multi-point steps, or document summaries, use clean standard bullet lists or numbered points. Do NOT cram paragraphs inside table cells.
+- If verified numbers are unavailable, direct the student to https://kdppatan.ac.in or the administration office.
+- Respond strictly in ${language === 'gu' ? 'Gujarati' : language === 'hi' ? 'Hindi' : 'English'}.`;
 
     if (mode === 'admission_kd') {
-      systemContext = `You are the official Admission Counselor for Kilachand Devchand (K.D.) Polytechnic, Patan (Gujarat).
-Verified Ground-Truth (https://kdppatan.ac.in):
-- Institute: Kilachand Devchand Polytechnic, Patan (Government Institute under CTE Gujarat, affiliated with GTU).
-- Admission: Centralized Online Admission via ACPDC Gujarat (Merit & Reservation: OPEN, SEBC, SC, ST, EWS, TFW).
-- Programs: 3-Year Diploma Engineering in Computer, IT, Civil, Mechanical, and Electrical.
-- Fees: Government nominal fee (~₹1000/year for boys, free for girls under government schemes).
-- Facilities: Advanced Computing Labs, High-Speed Internet/LAN, Boys Hostel on campus, GTU-aligned syllabus.
-When an image or document is attached (e.g. marksheet, fee receipt, merit slip), thoroughly read and extract numbers, transaction IDs, payment status, dates, and names.
-Respond in ${language === 'gu' ? 'Gujarati' : language === 'hi' ? 'Hindi' : 'English'}. Provide clear, structured bullet points.`;
+      systemContext += `
+VERIFIED ADMISSION GROUND-TRUTH (K.D. Polytechnic Patan):
+- Institute: Kilachand Devchand Polytechnic, Patan (Government Institute under DTE Gujarat, affiliated with GTU).
+- Codes: DTE Code: 622 | GTU Code: 622.
+- Admission Authority: ACPDC Gujarat (acpdc.gujarat.gov.in).
+- Eligibility: 10th Standard (SSC) with Mathematics, Science, and English.
+- Offered Branches: Computer Engineering, Information Technology, Civil Engineering, Mechanical Engineering, Electrical Engineering.
+- Fee Structure: Boys ~₹1,000-₹1,500/year. Girls: 100% Tuition Fee Exemption (Kanya Kelavani - Free tuition).
+- Hostel: On-campus Boys Hostel available (~₹600/term). Girls accommodated in government social welfare hostels.`;
     } else {
-      systemContext = `You are the KD Campus AI Student Services Assistant helping with scholarships (Digital Gujarat MYSY, Freeship card for SC/ST/SEBC), GTU exam forms, latest circulars, semester syllabus, and results (result.gtu.ac.in).
-When an image or document is attached (e.g. MOOC receipt, fee voucher, hall ticket, marksheet), read every field like course name, student details, amount paid, and verification status.
-Respond in ${language === 'gu' ? 'Gujarati' : language === 'hi' ? 'Hindi' : 'English'}. Provide clear, structured bullet points.`;
+      systemContext += `
+VERIFIED STUDENT SERVICES GROUND-TRUTH (GTU & Gujarat Govt):
+- University: Gujarat Technological University (GTU). Portals: gtu.ac.in, student.gtu.ac.in, result.gtu.ac.in.
+- Progression/Detention: 100-point activity scheme; max 4 pending backlogs permitted from Sem 1 & 2 to enter Sem 5.
+- Scholarships:
+  1. MYSY: 80+ percentile in 10th SSC, family income <= ₹6 Lakh/year.
+  2. Digital Gujarat: SC/ST/OBC/SEBC post-matric scholarship & Freeship card.
+- Document Analysis Task: Thoroughly review extracted document content, verify fees, transaction IDs, enrollment numbers, subjects, student name, and dates.`;
     }
 
     // =========================================================================
-    // 1. ROUTE 1: PURE TEXT QUERIES -> GROQ (qwen/qwen3.8-27b)
+    // 2. BUILT-IN PDF & DOCUMENT PARSER (ZERO BUILD ERRORS)
     // =========================================================================
-    if (!hasFiles && groqKey) {
+    let extractedDocumentText = '';
+
+    if (hasFiles) {
+      for (const file of files) {
+        if (file.data) {
+          const buffer = Buffer.from(file.data, 'base64');
+          const isPdf = file.name?.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf';
+
+          if (isPdf) {
+            try {
+              const parsedText = await new Promise<string>((resolve) => {
+                const pdfParser = new (PDFParser as any)(null, 1);
+                pdfParser.on('pdfParser_dataReady', () => {
+                  try {
+                    const raw = (pdfParser as any).getRawTextContent();
+                    resolve(decodeURIComponent(raw || ''));
+                  } catch {
+                    resolve('');
+                  }
+                });
+                pdfParser.on('pdfParser_dataError', () => resolve(''));
+                pdfParser.parseBuffer(buffer);
+              });
+
+              if (parsedText.trim()) {
+                extractedDocumentText += `\n\n--- CONTENT OF UPLOADED DOCUMENT (${file.name}) ---\n${parsedText.trim()}\n--- END OF DOCUMENT ---\n`;
+              }
+            } catch (err) {
+              console.warn('PDF parsing error:', err);
+            }
+          }
+        }
+      }
+    }
+
+    const userPrompt = extractedDocumentText 
+      ? `${message || 'Please extract, analyze, and detail everything from this document.'}\n\n${extractedDocumentText}`
+      : message;
+
+    // =========================================================================
+    // 3. API CALL HELPERS
+    // =========================================================================
+    const callGroqGPT = async () => {
+      if (!groqKey) return null;
       try {
-        const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${groqKey}`,
           },
           body: JSON.stringify({
-            model: 'qwen/qwen3.8-27b',
+            model: 'openai/gpt-oss-120b',
             messages: [
               { role: 'system', content: systemContext },
-              { role: 'user', content: message },
+              { role: 'user', content: userPrompt },
             ],
             stream: true,
-            temperature: 0.3,
+            temperature: 0.2,
           }),
         });
-
-        if (groqRes.ok && groqRes.body) {
-          return new Response(createSSEReadableStream(groqRes.body), {
-            headers: {
-              'Content-Type': 'text/plain; charset=utf-8',
-              'Transfer-Encoding': 'chunked',
-            },
-          });
-        }
-      } catch (err) {
-        console.warn('Groq text call failed:', err);
+        return res.ok && res.body ? res.body : null;
+      } catch (e) {
+        console.warn('Groq error:', e);
+        return null;
       }
-    }
+    };
 
-    // =========================================================================
-    // 2. ROUTE 2: OCR / ATTACHMENTS & BACKUP -> OPENROUTER
-    // =========================================================================
-    if (openrouterKey) {
+    const callOpenRouterOxAlpha = async () => {
+      if (!openrouterKey) return null;
       try {
-        let userContent: any = message || 'Please analyze this attached document/receipt thoroughly.';
-
-        if (hasFiles) {
-          const parts: any[] = [{ type: 'text', text: userContent }];
-          for (const file of files) {
-            if (file.data && file.type) {
-              parts.push({
-                type: 'image_url',
-                image_url: {
-                  url: `data:${file.type};base64,${file.data}`,
-                },
-              });
-            }
-          }
-          userContent = parts;
-        }
-
-        const modelToUse = hasFiles ? 'google/gemini-2.0-flash-001' : 'stealth/ox-alpha';
-
-        const orRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -121,26 +129,42 @@ Respond in ${language === 'gu' ? 'Gujarati' : language === 'hi' ? 'Hindi' : 'Eng
             'X-Title': 'KD Campus AI',
           },
           body: JSON.stringify({
-            model: modelToUse,
+            model: 'stealth/ox-alpha',
             messages: [
               { role: 'system', content: systemContext },
-              { role: 'user', content: userContent },
+              { role: 'user', content: userPrompt },
             ],
             stream: true,
+            temperature: 0.2,
           }),
         });
-
-        if (orRes.ok && orRes.body) {
-          return new Response(createSSEReadableStream(orRes.body), {
-            headers: {
-              'Content-Type': 'text/plain; charset=utf-8',
-              'Transfer-Encoding': 'chunked',
-            },
-          });
-        }
-      } catch (orErr) {
-        console.error('OpenRouter call failed:', orErr);
+        return res.ok && res.body ? res.body : null;
+      } catch (e) {
+        console.warn('OpenRouter error:', e);
+        return null;
       }
+    };
+
+    // =========================================================================
+    // 4. ROUTING LOGIC
+    // =========================================================================
+    let activeStream: ReadableStream<Uint8Array> | null = null;
+
+    if (mode === 'admission_kd') {
+      activeStream = await callGroqGPT();
+      if (!activeStream) activeStream = await callOpenRouterOxAlpha();
+    } else {
+      activeStream = await callOpenRouterOxAlpha();
+      if (!activeStream) activeStream = await callGroqGPT();
+    }
+
+    if (activeStream) {
+      return new Response(createOpenAISSEReadableStream(activeStream), {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Transfer-Encoding': 'chunked',
+        },
+      });
     }
 
     return new Response(
@@ -152,7 +176,7 @@ Respond in ${language === 'gu' ? 'Gujarati' : language === 'hi' ? 'Hindi' : 'Eng
   }
 }
 
-function createSSEReadableStream(rawBody: ReadableStream<Uint8Array>) {
+function createOpenAISSEReadableStream(rawBody: ReadableStream<Uint8Array>) {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
 
