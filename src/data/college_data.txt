@@ -1,0 +1,159 @@
+=============================================================================
+KILACHAND DEVCHAND POLYTECHNIC, PATAN (K. D. POLYTECHNIC, PATAN)
+OFFICIAL KNOWLEDGE BASE & VERIFIED INSTITUTIONAL GROUND TRUTH
+Official Portal: https://kdppatan.ac.in
+Affiliation: Gujarat Technological University (GTU), Ahmedabad | DTE Gujarat
+Approval: All India Council for Technical Education (AICTE)
+Institutional Codes: DTE Code: 631 | GTU Code: 631
+Institute Type: Government Polytechnic Institute
+=============================================================================
+
+1. CONTACT & CAMPUS LOCATION
+-----------------------------------------------------------------------------
+- Institute Name: K. D. Polytechnic, Patan
+- Address: Opp. T. B. hospital, Hemchandracharya North University Road, Patan - 384265, Gujarat, India
+- Phone Number: 02766220419 / 02766-220419
+- Official Email: kdp-patan-dte@gujarat.gov.in
+- Office Hours: 10:30 AM to 06:10 PM (Closed on 2nd & 4th Saturdays, Sundays, and Public Holidays).
+
+2. OFFERED BRANCHES (ONLY 4 BRANCHES OFFERED)
+-----------------------------------------------------------------------------
+K. D. Polytechnic Patan currently offers ONLY four diploma engineering branches:
+1. Computer Engineering
+2. Electrical Engineering
+3. Mechanical Engineering
+4. Civil Engineering
+
+* STRICT NOTE ON IT BRANCH:
+Information Technology (IT) branch is NOT offered at K. D. Polytechnic Patan. If any student inquires about IT, clarify that only Computer Engineering, Electrical Engineering, Mechanical Engineering, and Civil Engineering are available.
+
+3. COMPUTER ENGINEERING DEPARTMENT - OVERVIEW & INTAKE
+-----------------------------------------------------------------------------
+- Program: Diploma in Computer Engineering (3 Years Full-Time Course)
+- Establishment: Year 2001
+- Accreditation / Approvals: Approved by AICTE, affiliated to GTU Ahmedabad, accredited by NBA.
+- Total Intake Capacity: 236 Seats
+  * Regular Intake: 180 Seats
+  * TFWS (Tuition Fee Waiver Scheme): 11 Seats
+  * EWS (Economically Weaker Section): 45 Seats
+- Vision: To produce competent diploma engineers through quality education with moral values to meet need of the society.
+- Mission:
+  * Provide quality education in both theory and practical to solve the problems.
+  * Encourage students for co-curricular activities.
+  * Provide exposure to latest technology.
+  * Transform students into socially responsible and ethical professional.
+- Program Educational Objectives (PEOs):
+  * PEO 1: Competent with knowledge of Computer Engineering to pursue higher education.
+  * PEO 2: Proficient to solve problems that are technically, economically, socially and environmentally acceptable.
+  * PEO 3: Efficient team leader, effective communicator and entrepreneur with ethics and moral values.
+- Key Department Highlights:
+  * Highly qualified, hard working, and experienced teaching staff.
+  * Analytical approach, design and practical-based teaching learning system.
+  * Extra coaching classes for weak students.
+  * Excellent counseling and academic follow-up system.
+  * Well-ventilated classrooms and audio-visual facility with modern teaching aids.
+  * Departmental library with reference books and project reports.
+  * Women Empowerment Cell activities, SSIP activities, Hackathons, and Project Fairs.
+
+4. COMPUTER ENGINEERING - COMPLETE FACULTY TEAM
+-----------------------------------------------------------------------------
+1. Dr. C. D. Patel - In-charge Head of Department (HOD)
+2. Dr. J. N. Acharya - Lecturer
+3. Pavankumar J. Joshi - Lecturer
+4. Dr. Rajik Saini - Lecturer
+5. M. R. Thakkar - Lecturer
+6. H. A. Patel - Lecturer
+7. S. D. Prajapati - Lecturer
+8. K. D. Prajapati - Lecturer
+9. P. M. PRAJAPATI - Lecturer
+10. K. M. Modhu - Lecturer
+11. R. V. Darji - Lecturer
+12. N. J. Patel - Lecturer
+13. D. R. DODIYA - Lecturer
+14. V. R. Patel - Lecturer
+15. M. C. Thakarar - Lecturer
+16. A. M. Mevada - Lecturer
+17. P. R. Sharma - Lecturer
+
+5. CLASSROOMS & AUDITORIUM INFRASTRUCTURE
+-----------------------------------------------------------------------------
+- Classrooms:
+  * CLASSROOM 1 (Room AB001): Ground floor academic block; equipped with ~20 benches, 6 fans, 8 tube lights, blackboard, and Class ABC fire extinguisher.
+  * CLASSROOM 2 (Room AB002): Ground floor academic block; equipped with ~20 benches, 6 fans, 8 tube lights, blackboard, and Class ABC fire extinguisher.
+  * CLASSROOM 3 (Room AB003): Equipped with modern projector for audio-visual/interactive learning and whiteboard.
+  * CLASSROOM 4 (Room F003): Equipped with projector for presentations, software demos, and whiteboard.
+  * CLASSROOM 5 (Room F004): Equipped with multimedia projector and whiteboard.
+  * CLASSROOM 6 (Room F111): Equipped with multimedia projector and whiteboard.
+  * CLASSROOM 7 (Room F112): Equipped with multimedia projector and whiteboard.
+- Department Seminar Hall:
+  * Capacity: 200 people.
+  * Facilities: State-of-the-art projector and sound system.
+  * Usage: Expert lectures, presentations, workshops, departmental meetings, and cultural/social events.
+
+6. LABORATORY INFRASTRUCTURE
+-----------------------------------------------------------------------------
+- LABORATORY 1: Basic Programming Lab (Room F007, Ground Floor)
+  * Hardware: 28 computer systems with modern configuration.
+  * Subjects: Basics of Computer Programming (C), Fundamental of Computer Application, and Object-Oriented Programming (C++).
+- LABORATORY 2: Advance Programming Lab (Room F010)
+  * Hardware: 28 computer systems with modern hardware, software stacks, and a projector.
+  * Subjects: Data structures, algorithms, advanced programming, software development, and debugging tools.
+- LABORATORY 7: Basic Electronics Lab (Room F104)
+  * Equipment: Digital electronic circuit kits and testing equipment.
+  * Subjects: Electronic principles, basic experiments, and hardware/electronic mini projects.
+- LABORATORY 8: Advance Web Development Lab (Room F108)
+  * Subjects: PHP, Web design tools, database-driven full stack development.
+- Hardware & Troubleshooting Lab: Hands-on CPU, RAM, motherboard, storage device assembly, peripheral interfacing, and OS troubleshooting.
+
+7. INTERNET, CWAN & NAMO WI-FI INFRASTRUCTURE
+-----------------------------------------------------------------------------
+- Internet Coverage: Fiber Optics, LAN connectivity, and NAMO WIFI across Labs, Classrooms, Library, and Departmental Offices.
+- Wi-Fi & LAN Network Metrics:
+  * Total Access Points: 14 Access Points
+  * Leased Line Speed: 10 MBPS
+  * Broadband Speed: 300 MBPS
+  * NAMO WIFI Speed: 100 MBPS
+- Security & Firewall: WatchGuard Security Appliance (CWAN gateway).
+
+8. GYMKHANA & EXTRA-CURRICULAR ACTIVITIES
+-----------------------------------------------------------------------------
+- Sports & Games: Chess, basketball, cricket, volleyball, badminton, table tennis.
+- Cultural Events: Essay writing, webinars, drawing competitions, cultural festivals.
+- Technical Events: Coding competitions, hackathons, and technical seminars.
+- Social & National Days: Independence Day, Youth Day, Signature Day celebrations.
+
+9. HOSTEL FACILITIES & ADMINISTRATION
+-----------------------------------------------------------------------------
+- Hostel Administration:
+  * Hostel Rector: Shri D. K. Raval
+  * Boys Hostel Warden: Shri H. V. Thakkar
+  * Girls Hostel Warden: Mrs. B. S. Sevkani
+- Boys Hostel (New Boy's Hostel):
+  * Total Rooms: 32 Rooms
+  * 3-Seater Rooms: 32 Rooms (Total 96 beds capacity)
+  * Total Student Capacity: 96 Students
+- Girls Hostel:
+  * Total Rooms: 28 Rooms
+  * 3-Seater Rooms: 16 Rooms (Total 84 beds capacity)
+  * Total Student Capacity: 84 Students
+- Amenities Available in Hostels:
+  * Well-furnished rooms with beds, study tables, chairs.
+  * 24/7 RO purified drinking water facility.
+  * Separate study / reading room.
+  * TV and entertainment room.
+  * Solar water heating system.
+  * CCTV surveillance and 24/7 security guards.
+  * Clean, well-maintained campus and green garden.
+- Admission & Fees: Allotment as per ACPDC/Government hostel admission norms. Application form available from Rector/Warden office. Online hostel payment link available on website.
+
+10. ADMISSIONS, FEES & SCHOLARSHIPS GROUND TRUTH
+-----------------------------------------------------------------------------
+- Admission Gateway: Centralized ACPDC Gujarat (https://acpdc.gujarat.gov.in) based on 10th SSC merit.
+- Annual Tuition Fees:
+  * Boys: Approx. ₹1,000 to ₹1,500 per year.
+  * Girls: 100% Tuition Fee Exemption under the Government "Kanya Kelavani" scheme (Completely free tuition).
+- Scholarships:
+  * MYSY (Mukhyamantri Yuva Swavalamban Yojana): 80+ percentile in 10th SSC, annual family income <= ₹6,00,000.
+  * Digital Gujarat Portal (https://www.digitalgujarat.gov.in): Post-matric scholarships for SC, ST, SEBC/OBC, and EWS students.
+- GTU Rules: Minimum 75% attendance mandatory. Max 4 backlogs from Sem 1 & 2 allowed for entry into Sem 5.
+=============================================================================

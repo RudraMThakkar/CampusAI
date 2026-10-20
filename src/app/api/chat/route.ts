@@ -1,5 +1,19 @@
 import { NextRequest } from 'next/server';
+import fs from 'fs';
+import path from 'path';
 import PDFParser from 'pdf2json';
+
+function getLocalCollegeKnowledge(): string {
+  try {
+    const filePath = path.join(process.cwd(), 'src', 'data', 'college_data.txt');
+    if (fs.existsSync(filePath)) {
+      return fs.readFileSync(filePath, 'utf-8');
+    }
+  } catch (err) {
+    console.warn('Could not read college_data.txt:', err);
+  }
+  return '';
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,39 +29,68 @@ export async function POST(req: NextRequest) {
     const groqKey = process.env.GROQ_API_KEY;
     const openrouterKey = process.env.OPENROUTER_API_KEY;
 
-    // =========================================================================
-    // 1. INSTITUTIONAL GROUND TRUTH
-    // =========================================================================
-    let systemContext = `You are KD Campus AI, the official academic intelligence assistant for Kilachand Devchand (K.D.) Polytechnic, Patan (Gujarat).
-STRICT FORMATTING & ACCURACY RULES:
-- Never fabricate admission cut-offs, fee amounts, or GTU regulations.
-- For checklists, multi-point steps, or document summaries, use clean standard bullet lists or numbered points. Do NOT cram paragraphs inside table cells.
-- If verified numbers are unavailable, direct the student to https://kdppatan.ac.in or the administration office.
-- Respond strictly in ${language === 'gu' ? 'Gujarati' : language === 'hi' ? 'Hindi' : 'English'}.`;
+    const collegeKnowledge = getLocalCollegeKnowledge();
 
-    if (mode === 'admission_kd') {
-      systemContext += `
-VERIFIED ADMISSION GROUND-TRUTH (K.D. Polytechnic Patan):
-- Institute: Kilachand Devchand Polytechnic, Patan (Government Institute under DTE Gujarat, affiliated with GTU).
-- Codes: DTE Code: 621 | GTU Code: 622.
-- Admission Authority: ACPDC Gujarat (acpdc.gujarat.gov.in).
-- Eligibility: 10th Standard (SSC) with Mathematics, Science, and English.
-- Offered Branches: Computer Engineering, Information Technology, Civil Engineering, Mechanical Engineering, Electrical Engineering.
-- Fee Structure: Boys ~₹1,000-₹1,500/year. Girls: 100% Tuition Fee Exemption (Kanya Kelavani - Free tuition).
-- Hostel: On-campus Boys Hostel available (~₹600/term). Girls accommodated in government social welfare hostels.`;
+    // =========================================================================
+    // DUAL-DESK ROLE PROMPT DEFINITION
+    // =========================================================================
+    let systemContext = '';
+
+    if (mode === 'student_assistant') {
+      systemContext = `You are the AI Student Assistant for Kilachand Devchand (K.D.) Polytechnic, Patan.
+
+STRICT OPERATIONAL BOUNDARIES & RESTRICTIONS:
+1. PERMITTED TOPICS ONLY:
+   - How to check GTU exam results (guide them to result.gtu.ac.in).
+   - How to search diploma subjects, syllabus, course codes, and curriculum.
+   - Academic coding assistance (C, C++, Java, Python, Web Dev, DSA, SQL).
+   - Academic engineering mathematics and calculations.
+   - Uploaded student receipt/document analysis.
+
+2. STRICT PROHIBITED TOPICS:
+   - DO NOT answer questions regarding Admissions, ACPDC merit ranks, admission cut-offs.
+   - DO NOT answer questions regarding Scholarships (MYSY, Digital Gujarat), college admission fees, or hostel admission fees.
+
+3. REFUSAL PROTOCOL FOR PROHIBITED TOPICS:
+   If the student asks about admission, eligibility, scholarships, or college fees in this mode, DO NOT answer. Respond strictly with:
+   "I am the Student Assistant for academic doubts, coding, calculations, and GTU results/syllabus guidance. For admissions, fees, hostel, or scholarships, please switch to the 'KD Admission Desk' tab above or contact the administration office at K.D. Polytechnic, Patan."
+
+4. Strictly avoid raw HTML tags like <br>. Use clean markdown.
+5. Target Language: ${language === 'gu' ? 'Gujarati' : language === 'hi' ? 'Hindi' : 'English'}.`;
     } else {
-      systemContext += `
-VERIFIED STUDENT SERVICES GROUND-TRUTH (GTU & Gujarat Govt):
-- University: Gujarat Technological University (GTU). Portals: gtu.ac.in, student.gtu.ac.in, result.gtu.ac.in.
-- Progression/Detention: 100-point activity scheme; max 4 pending backlogs permitted from Sem 1 & 2 to enter Sem 5.
-- Scholarships:
-  1. MYSY: 80+ percentile in 10th SSC, family income <= ₹6 Lakh/year.
-  2. Digital Gujarat: SC/ST/OBC/SEBC post-matric scholarship & Freeship card.
-- Document Analysis Task: Thoroughly review extracted document content, verify fees, transaction IDs, enrollment numbers, subjects, student name, and dates.`;
+      // Admission Desk Mode
+      systemContext = `You are the Official KD Admission Desk for Kilachand Devchand (K.D.) Polytechnic, Patan.
+
+CRITICAL INSTRUCTIONS & STRICT BOUNDARIES:
+1. YOU ARE A STRICT CLOSED-DOMAIN AGENT. You must ONLY answer questions based on:
+   - The verified College Knowledge Base provided below.
+   - The official college website: https://kdppatan.ac.in.
+   - Uploaded receipts/documents if provided.
+2. ABSOLUTELY DO NOT answer general out-of-scope world knowledge or unrelated queries.
+3. If the information is not in the official college records or website, answer with:
+   "This data is not available in our official college records. Please contact the respective college administration office at K.D. Polytechnic, Patan (Website: https://kdppatan.ac.in)."
+4. Strictly avoid raw HTML tags like <br>. Use clean markdown.
+5. Target Language: ${language === 'gu' ? 'Gujarati' : language === 'hi' ? 'Hindi' : 'English'}.
+
+=============================================================================
+AUTHORIZED COLLEGE KNOWLEDGE BASE:
+=============================================================================
+${collegeKnowledge || `
+- Institute: Kilachand Devchand Polytechnic, Patan.
+- Codes: DTE Code: 631 | GTU Code: 631.
+- Official Website: https://kdppatan.ac.in
+- Offered Branches (Only 4): Computer Engineering, Civil Engineering, Mechanical Engineering, Electrical Engineering.
+- Note: Information Technology (IT) branch is NOT available at K.D. Polytechnic Patan.
+- Fees: Boys ~₹1,000-₹1,500/year. Girls: 100% Tuition Fee Exemption (Kanya Kelavani).
+- Hostel: Boys on-campus (~₹600/term). Girls: Government Social Welfare hostel.
+- Admission: Through ACPDC Gujarat (acpdc.gujarat.gov.in) based on 10th SSC.
+- Scholarships: MYSY (80+ percentile, <= 6 Lakh income) & Digital Gujarat.
+`}
+=============================================================================`;
     }
 
     // =========================================================================
-    // 2. BUILT-IN PDF & DOCUMENT PARSER (ZERO BUILD ERRORS)
+    // BUILT-IN PDF PARSER
     // =========================================================================
     let extractedDocumentText = '';
 
@@ -85,12 +128,10 @@ VERIFIED STUDENT SERVICES GROUND-TRUTH (GTU & Gujarat Govt):
     }
 
     const userPrompt = extractedDocumentText 
-      ? `${message || 'Please extract, analyze, and detail everything from this document.'}\n\n${extractedDocumentText}`
+      ? `${message || 'Please extract and analyze details from this document.'}\n\n${extractedDocumentText}`
       : message;
 
-    // =========================================================================
-    // 3. API CALL HELPERS
-    // =========================================================================
+    // API Call Helpers
     const callGroqGPT = async () => {
       if (!groqKey) return null;
       try {
@@ -107,12 +148,11 @@ VERIFIED STUDENT SERVICES GROUND-TRUTH (GTU & Gujarat Govt):
               { role: 'user', content: userPrompt },
             ],
             stream: true,
-            temperature: 0.2,
+            temperature: mode === 'student_assistant' ? 0.2 : 0.0,
           }),
         });
         return res.ok && res.body ? res.body : null;
       } catch (e) {
-        console.warn('Groq error:', e);
         return null;
       }
     };
@@ -135,21 +175,16 @@ VERIFIED STUDENT SERVICES GROUND-TRUTH (GTU & Gujarat Govt):
               { role: 'user', content: userPrompt },
             ],
             stream: true,
-            temperature: 0.2,
+            temperature: mode === 'student_assistant' ? 0.2 : 0.0,
           }),
         });
         return res.ok && res.body ? res.body : null;
       } catch (e) {
-        console.warn('OpenRouter error:', e);
         return null;
       }
     };
 
-    // =========================================================================
-    // 4. ROUTING LOGIC
-    // =========================================================================
     let activeStream: ReadableStream<Uint8Array> | null = null;
-
     if (mode === 'admission_kd') {
       activeStream = await callGroqGPT();
       if (!activeStream) activeStream = await callOpenRouterOxAlpha();
