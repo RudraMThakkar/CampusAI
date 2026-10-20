@@ -29,7 +29,7 @@ STRICT FORMATTING & ACCURACY RULES:
       systemContext += `
 VERIFIED ADMISSION GROUND-TRUTH (K.D. Polytechnic Patan):
 - Institute: Kilachand Devchand Polytechnic, Patan (Government Institute under DTE Gujarat, affiliated with GTU).
-- Codes: DTE Code: 622 | GTU Code: 622.
+- Codes: DTE Code: 621 | GTU Code: 622.
 - Admission Authority: ACPDC Gujarat (acpdc.gujarat.gov.in).
 - Eligibility: 10th Standard (SSC) with Mathematics, Science, and English.
 - Offered Branches: Computer Engineering, Information Technology, Civil Engineering, Mechanical Engineering, Electrical Engineering.
