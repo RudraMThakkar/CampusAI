@@ -31,9 +31,6 @@ export async function POST(req: NextRequest) {
 
     const collegeKnowledge = getLocalCollegeKnowledge();
 
-    // =========================================================================
-    // DUAL-DESK ROLE PROMPT DEFINITION
-    // =========================================================================
     let systemContext = '';
 
     if (mode === 'student_assistant') {
@@ -58,7 +55,6 @@ STRICT OPERATIONAL BOUNDARIES & RESTRICTIONS:
 4. Strictly avoid raw HTML tags like <br>. Use clean markdown.
 5. Target Language: ${language === 'gu' ? 'Gujarati' : language === 'hi' ? 'Hindi' : 'English'}.`;
     } else {
-      // Admission Desk Mode
       systemContext = `You are the Official KD Admission Desk for Kilachand Devchand (K.D.) Polytechnic, Patan.
 
 CRITICAL INSTRUCTIONS & STRICT BOUNDARIES:
@@ -75,23 +71,10 @@ CRITICAL INSTRUCTIONS & STRICT BOUNDARIES:
 =============================================================================
 AUTHORIZED COLLEGE KNOWLEDGE BASE:
 =============================================================================
-${collegeKnowledge || `
-- Institute: Kilachand Devchand Polytechnic, Patan.
-- Codes: DTE Code: 631 | GTU Code: 631.
-- Official Website: https://kdppatan.ac.in
-- Offered Branches (Only 4): Computer Engineering, Civil Engineering, Mechanical Engineering, Electrical Engineering.
-- Note: Information Technology (IT) branch is NOT available at K.D. Polytechnic Patan.
-- Fees: Boys ~₹1,000-₹1,500/year. Girls: 100% Tuition Fee Exemption (Kanya Kelavani).
-- Hostel: Boys on-campus (~₹600/term). Girls: Government Social Welfare hostel.
-- Admission: Through ACPDC Gujarat (acpdc.gujarat.gov.in) based on 10th SSC.
-- Scholarships: MYSY (80+ percentile, <= 6 Lakh income) & Digital Gujarat.
-`}
+${collegeKnowledge}
 =============================================================================`;
     }
 
-    // =========================================================================
-    // BUILT-IN PDF PARSER
-    // =========================================================================
     let extractedDocumentText = '';
 
     if (hasFiles) {
@@ -131,8 +114,7 @@ ${collegeKnowledge || `
       ? `${message || 'Please extract and analyze details from this document.'}\n\n${extractedDocumentText}`
       : message;
 
-    // API Call Helpers
-    const callGroqGPT = async () => {
+    const callGroqLlama = async () => {
       if (!groqKey) return null;
       try {
         const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -142,7 +124,7 @@ ${collegeKnowledge || `
             'Authorization': `Bearer ${groqKey}`,
           },
           body: JSON.stringify({
-            model: 'openai/gpt-oss-120b',
+            model: 'llama-3.3-70b-versatile',
             messages: [
               { role: 'system', content: systemContext },
               { role: 'user', content: userPrompt },
@@ -153,11 +135,12 @@ ${collegeKnowledge || `
         });
         return res.ok && res.body ? res.body : null;
       } catch (e) {
+        console.warn('Groq error:', e);
         return null;
       }
     };
 
-    const callOpenRouterOxAlpha = async () => {
+    const callOpenRouter = async () => {
       if (!openrouterKey) return null;
       try {
         const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -169,7 +152,7 @@ ${collegeKnowledge || `
             'X-Title': 'KD Campus AI',
           },
           body: JSON.stringify({
-            model: 'stealth/ox-alpha',
+            model: 'meta-llama/llama-3.3-70b-instruct',
             messages: [
               { role: 'system', content: systemContext },
               { role: 'user', content: userPrompt },
@@ -180,17 +163,14 @@ ${collegeKnowledge || `
         });
         return res.ok && res.body ? res.body : null;
       } catch (e) {
+        console.warn('OpenRouter error:', e);
         return null;
       }
     };
 
-    let activeStream: ReadableStream<Uint8Array> | null = null;
-    if (mode === 'admission_kd') {
-      activeStream = await callGroqGPT();
-      if (!activeStream) activeStream = await callOpenRouterOxAlpha();
-    } else {
-      activeStream = await callOpenRouterOxAlpha();
-      if (!activeStream) activeStream = await callGroqGPT();
+    let activeStream = await callGroqLlama();
+    if (!activeStream) {
+      activeStream = await callOpenRouter();
     }
 
     if (activeStream) {
