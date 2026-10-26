@@ -1,6 +1,6 @@
 =============================================================================
 KILACHAND DEVCHAND POLYTECHNIC, PATAN (K. D. POLYTECHNIC, PATAN)
-OFFICIAL KNOWLEDGE BASE & VERIFIED INSTITUTIONAL GROUND TRUTH
+OFFICIAL KNOWLEDGE BASE & VERIFIED INSTITUTIONAL GROUND TRUTH (ALL DEPARTMENTS)
 Official Portal: https://kdppatan.ac.in
 Affiliation: Gujarat Technological University (GTU), Ahmedabad | DTE Gujarat
 Approval: All India Council for Technical Education (AICTE)
@@ -14,9 +14,36 @@ Institute Type: Government Polytechnic Institute
 - Address: Opp. T. B. hospital, Hemchandracharya North University Road, Patan - 384265, Gujarat, India
 - Phone Number: 02766220419 / 02766-220419
 - Official Email: kdp-patan-dte@gujarat.gov.in
+- Principal Email: principalkdp631@gmail.com
 - Office Hours: 10:30 AM to 06:10 PM (Closed on 2nd & 4th Saturdays, Sundays, and Public Holidays).
+- Social Media: Facebook page of K. D. Polytechnic, Patan (linked on the official website).
 
-2. OFFERED BRANCHES (ONLY 4 BRANCHES OFFERED)
+2. ABOUT THE INSTITUTE
+-----------------------------------------------------------------------------
+- Kilachand Devchand Polytechnic (commonly known as K.D. Polytechnic) was established in the year 1961 at Patan, Gujarat, India.
+- Objective: To provide quality technical education to students of North Gujarat.
+- It is a state government polytechnic that has played a significant role in producing skilled diploma engineers to meet the needs of industry and society.
+- It offers AICTE-approved diploma programs in four engineering specializations, designed to align with current industrial requirements and technological advancements.
+- It is affiliated with Gujarat Technological University (GTU), Ahmedabad, ensuring standardized academic practices and quality education.
+- Recognized as one of the premier technical education institutes in North Gujarat. It emphasizes holistic development by encouraging freedom of thought, innovation, and ethical responsibility, and nurtures social awareness, environmental concern, and professional discipline among students.
+- Program duration: 3 Years Diploma (full time).
+
+3. INSTITUTE VISION & MISSION
+-----------------------------------------------------------------------------
+- Vision: To impart quality technical education and create an ethically sound class of well-trained youth that can achieve opportunities in industries and serve the society.
+- Mission:
+  * M1: To develop well-equipped laboratories and good academic infrastructure.
+  * M2: To promote co-curricular and extra-curricular activities for overall personality development of the students.
+  * M3: To strengthen industry institute interaction.
+  * M4: To inculcate entrepreneurial skills.
+  * M5: To instill discipline and social awareness among students and enable them to deal with practical problems in daily life.
+
+4. PRINCIPAL & PRINCIPAL'S MESSAGE
+-----------------------------------------------------------------------------
+- Principal: H. C. Parmar
+- Summary of Principal's Message: The institute was established with the vision of providing quality technical education, especially to students from rural and semi-urban areas. It started with limited diploma engineering branches and basic infrastructure, and gradually expanded its academic programs and campus facilities. Today it offers various diploma engineering courses supported by well-equipped laboratories, classrooms, and computer centers. It is approved by AICTE and affiliated to GTU, following recognized academic standards and updated curricula. The polytechnic has produced many skilled diploma engineers serving in different industries and organizations. It emphasizes practical learning, discipline, innovation, and professional ethics, and organizes seminars, technical events, and co-curricular activities for the overall development of students. It stands as a reputed and trusted technical institution in the Idar region, contributing to technical education and regional growth.
+
+5. DEPARTMENTS, BRANCHES & INTAKE (ONLY 4 DIPLOMA BRANCHES OFFERED)
 -----------------------------------------------------------------------------
 K. D. Polytechnic Patan currently offers ONLY four diploma engineering branches:
 1. Computer Engineering
@@ -24,18 +51,43 @@ K. D. Polytechnic Patan currently offers ONLY four diploma engineering branches:
 3. Mechanical Engineering
 4. Civil Engineering
 
+In addition, the website lists two academic support departments (these are NOT separate diploma branches):
+- Applied Mechanics (supports Civil and Mechanical branches)
+- Science & Humanities (the "First Year Department" - Mathematics, Physics, Chemistry, English)
+
 * STRICT NOTE ON IT BRANCH:
 Information Technology (IT) branch is NOT offered at K. D. Polytechnic Patan. If any student inquires about IT, clarify that only Computer Engineering, Electrical Engineering, Mechanical Engineering, and Civil Engineering are available.
 
-3. COMPUTER ENGINEERING DEPARTMENT - OVERVIEW & INTAKE
+- Approved Intake Capacity (Sanctioned intake for diploma programs):
+  | Branch                | AICTE Intake | Supernumerary Seats (25%) | AICTE + Supernumerary | TFWS (5%) | Total Seats for Admission |
+  | Civil Engineering     | 120          | 30                        | 150                   | 7         | 157                       |
+  | Computer Engineering  | 180          | 45                        | 225                   | 11        | 236                       |
+  | Electrical Engineering| 90           | 23                        | 113                   | 5         | 118                       |
+  | Mechanical Engineering| 120          | 30                        | 150                   | 8         | 158                       |
+  (TFWS = Tuition Fee Waiver Scheme)
+- Total AICTE intake across the four branches: 510 (120 + 180 + 90 + 120).
+
+6. NBA ACCREDITATION STATUS
+-----------------------------------------------------------------------------
+- The institute states: "Our programs are accredited by National Board of Accreditation (NBA)".
+- Computer Engineering: NBA accredited for 3 years (2026-27 to 2028-29).
+- Mechanical Engineering: NBA accredited for 3 years (2026-27 to 2028-29).
+- Electrical Engineering: NBA accredited for 3 years (2026-27 to 2028-29).
+- Civil Engineering: NBA accreditation is not listed on the website's accreditation page.
+
+=============================================================================
+DEPARTMENT-WISE INFORMATION
+=============================================================================
+
+7. COMPUTER ENGINEERING DEPARTMENT - OVERVIEW & INTAKE
 -----------------------------------------------------------------------------
 - Program: Diploma in Computer Engineering (3 Years Full-Time Course)
 - Establishment: Year 2001
-- Accreditation / Approvals: Approved by AICTE, affiliated to GTU Ahmedabad, accredited by NBA.
+- Accreditation / Approvals: Approved by AICTE, affiliated to GTU Ahmedabad, accredited by NBA (2026-27 to 2028-29).
 - Total Intake Capacity: 236 Seats
-  * Regular Intake: 180 Seats
+  * AICTE Intake: 180 Seats
+  * Supernumerary Seats (25%): 45 Seats
   * TFWS (Tuition Fee Waiver Scheme): 11 Seats
-  * EWS (Economically Weaker Section): 45 Seats
 - Vision: To produce competent diploma engineers through quality education with moral values to meet need of the society.
 - Mission:
   * Provide quality education in both theory and practical to solve the problems.
@@ -54,8 +106,9 @@ Information Technology (IT) branch is NOT offered at K. D. Polytechnic Patan. If
   * Well-ventilated classrooms and audio-visual facility with modern teaching aids.
   * Departmental library with reference books and project reports.
   * Women Empowerment Cell activities, SSIP activities, Hackathons, and Project Fairs.
+- Recent department event: Seminar on "Energy & Environment Conservation Awareness Program" for Computer Engg Dept (01 May 2026).
 
-4. COMPUTER ENGINEERING - COMPLETE FACULTY TEAM
+8. COMPUTER ENGINEERING - COMPLETE FACULTY TEAM
 -----------------------------------------------------------------------------
 1. Dr. C. D. Patel - In-charge Head of Department (HOD)
 2. Dr. J. N. Acharya - Lecturer
@@ -75,7 +128,7 @@ Information Technology (IT) branch is NOT offered at K. D. Polytechnic Patan. If
 16. A. M. Mevada - Lecturer
 17. P. R. Sharma - Lecturer
 
-5. CLASSROOMS & AUDITORIUM INFRASTRUCTURE
+9. COMPUTER ENGINEERING - CLASSROOMS & SEMINAR HALL
 -----------------------------------------------------------------------------
 - Classrooms:
   * CLASSROOM 1 (Room AB001): Ground floor academic block; equipped with ~20 benches, 6 fans, 8 tube lights, blackboard, and Class ABC fire extinguisher.
@@ -90,7 +143,7 @@ Information Technology (IT) branch is NOT offered at K. D. Polytechnic Patan. If
   * Facilities: State-of-the-art projector and sound system.
   * Usage: Expert lectures, presentations, workshops, departmental meetings, and cultural/social events.
 
-6. LABORATORY INFRASTRUCTURE
+10. COMPUTER ENGINEERING - LABORATORY INFRASTRUCTURE
 -----------------------------------------------------------------------------
 - LABORATORY 1: Basic Programming Lab (Room F007, Ground Floor)
   * Hardware: 28 computer systems with modern configuration.
@@ -105,37 +158,275 @@ Information Technology (IT) branch is NOT offered at K. D. Polytechnic Patan. If
   * Subjects: PHP, Web design tools, database-driven full stack development.
 - Hardware & Troubleshooting Lab: Hands-on CPU, RAM, motherboard, storage device assembly, peripheral interfacing, and OS troubleshooting.
 
-7. INTERNET, CWAN & NAMO WI-FI INFRASTRUCTURE
+11. ELECTRICAL ENGINEERING DEPARTMENT - OVERVIEW
 -----------------------------------------------------------------------------
-- Internet Coverage: Fiber Optics, LAN connectivity, and NAMO WIFI across Labs, Classrooms, Library, and Departmental Offices.
+- Program: Diploma in Electrical Engineering (3 Years Full-Time Course)
+- Establishment: One of the founding departments of the college; started functioning in 1961.
+- Accreditation: Approved by AICTE, affiliated to GTU; NBA accredited for 3 years (2026-27 to 2028-29).
+- Intake: Total Intake 90 (AICTE). Supernumerary seats 23, TFWS 5, total seats for admission 118.
+- About: The department has been rated very high in academic circles since its inception and provides quality technical education. It strives to be a Centre of Excellence in technical education to sculpt skilled electrical engineers. The department is dynamic and vibrant with a blend of young and experienced faculty members.
+- Vision: To be a committed department to deliver quality technical education to create ethically sound and well-trained electrical engineers for industries and society.
+- Mission:
+  * 1. To impart quality technical education through good academic infrastructure and well-equipped laboratories.
+  * 2. To enhance technical skills to become competent electrical engineers by industry interaction.
+  * 3. To promote entrepreneurship skills & leadership skills through co-curricular and extra-curricular activities.
+  * 4. To inculcate social responsibilities and problem-solving skills of day to day life to serve the society and industries.
+- Program Educational Objectives (PEOs):
+  * 1. Manage own electrical engineering enterprise.
+  * 2. Adapt the changing technologies to solve the electrical engineering problem for societal needs.
+  * 3. Develop proficiency in maintaining various electrical equipment.
+- Program Specific Outcomes (PSOs):
+  * 1. Maintain various types of electrical equipments.
+  * 2. Undertake the electrification of commercial and multi storied buildings.
+
+12. ELECTRICAL ENGINEERING - FACULTY TEAM
+-----------------------------------------------------------------------------
+1. Bhati Jigneshkumar Bhavarlal - In-charge Head of Department
+2. Rakeshkumar Dilipkumar Modi - Lecturer
+3. Dhirajkumar Nalchand Thakkar - Lecturer
+4. Dipkumar S. Trivedi - Lecturer
+5. Hardikkumar Vishnubhai Patel - Lecturer
+6. Manojkumar Shivabhai Patel - Lecturer
+7. Arpit Rajnibhai Joshi - Lecturer
+8. Parth Rameshbhai Mishra - Lecturer
+9. Bhumikaben Rameshchandra Sevkani - Lecturer
+10. Hirenkumar Sureshbhai Darji - Lecturer
+11. Keyurkumar A. Prajapati - Lecturer
+12. Ronak Jayantibhai Prajapati - Lecturer
+13. Patel Chetankumar Becharbhai - Lecturer
+14. Sanjaykumar Vishnubhai Patel - Lecturer
+15. Disha D. Desai - Lecturer
+
+13. ELECTRICAL ENGINEERING - FACILITIES & ACTIVITIES
+-----------------------------------------------------------------------------
+- Facilities listed on the department page: Computer Lab; Power System Lab and Class Room; Electrical Instrumentation and Electronics Lab; Class Room 1; Class Room 2; Class Room 3.
+- The department page lists 42 activities in total. Recent activities (newest first):
+  * PROJECT EXPO 2026 (Expo) - 23 Oct 2026
+  * Two-day workshop "Electrical Wiring to Smart Automation Using AI" - 22 to 23 Oct 2026
+  * Cleanliness Drive (under Seva Sankalp Abhiyan) - 25 Sep 2026
+  * Road Safety Activities awareness (under Seva Sankalp Abhiyan) - 24 Sep 2026
+  * CIVIC SENSE seminar - 04 Aug 2026
+  * 1st Year Orientation Program for 2026 batch - 27 Jul 2026
+  * Seminar on "Career Option" for Final year Students - 21 Jul 2026
+  * Awareness Session on National Task Force (NTF) - 21 Apr 2026
+  * GTU LIC Inspection - 09 Apr 2026
+  * Expert Lecture on "Wind Energy" by Shri N. M. Patel from SPCE - 07 Apr 2026
+  * Visit to 220 kV Substation Sankhari for Sem-4 & 6 students - 06 Apr 2026
+  * Parents Teachers Meeting - 04 Apr 2026
+  * 6th sem students visit at GPERI Mehsana - 01 Apr 2026
+  * Seminar on PLC SCADA Microcontroller by SOFCON PVT LTD - 30 Mar 2026
+  * Workshop on Domestic Wiring - 01 Sep 2025
+  * Expert Lecture on Solar Inverter - 01 Aug 2025
+  * Seminar on "Mind to Market" - 31 Jul 2025
+
+14. MECHANICAL ENGINEERING DEPARTMENT - OVERVIEW
+-----------------------------------------------------------------------------
+- Program: Diploma in Mechanical Engineering (3 Years Full-Time Course)
+- Approved by AICTE; Affiliated to GTU Ahmedabad; NBA accredited for 3 years (2026-27 to 2028-29).
+- Intake: Total Intake 120 (AICTE). Supernumerary seats 30, TFWS 8, total seats for admission 158.
+- About: Mechanical Engineering is one of the oldest and most versatile branches of engineering, forming the backbone of industrial development. It deals with design, analysis, manufacturing, and maintenance of mechanical systems. The program provides a strong foundation in thermodynamics, fluid mechanics, strength of materials, manufacturing processes, and machine design. The department balances theoretical knowledge with practical exposure through well-equipped laboratories, industry-oriented projects, and hands-on training, and encourages problem-solving, innovative thinking, and technical expertise.
+- Vision: To impart quality technical education and prepare competent diploma mechanical engineers to cater industry needs and carry out innovation.
+- Mission:
+  * 1. To adopt outcome based curricula and implement innovative teaching learning process for realizing outcome based education.
+  * 2. To provide opportunities to the students for the development of professional skills.
+  * 3. To inculcate life-long learning approach in the students.
+- Program Educational Objectives (PEOs): Pursue higher education; Work as successful professional in industry; Work in multidisciplinary area with a focus on innovation.
+- The department actively promotes: Industry collaboration and industrial visits; Energy conservation and sustainable engineering practices; Skill development through workshops and internships; Research and innovation in emerging technologies.
+
+15. MECHANICAL ENGINEERING - FACULTY TEAM
+-----------------------------------------------------------------------------
+1. Mr. Hardik C. Parmar - Head of the Department
+2. Dr. Heminkumar V. Thakkar - Lecturer (Mechanical)
+3. Mr. Dhruvkumar K. Raval - Lecturer (Mechanical)
+4. Mr. Hitesh J. Yadav - Lecturer (Mechanical)
+5. Mr. Yogeshkumar R. Patel - Lecturer (Mechanical)
+6. Mr. Kalpeshkumar S. Patel - Lecturer (Mechanical)
+7. Mr. Vijaykumar P. Chaudhari - Lecturer (Mechanical)
+8. Mr. Gaurang S. Patel - Lecturer (Mechanical)
+9. Dr. Niravkumar J. Prajapati - Lecturer (Mechanical)
+10. Mr. Kishankumar R. Patel - Lecturer (Mechanical)
+11. Mr. Jayprakash P. Fudani - Lecturer (Mechanical)
+12. Mr. Hirenkumar R. Patel - Lecturer (Mechanical)
+13. Mr. Axeshkumar D. Patel - Lecturer (Mechanical)
+14. Dr. Hitesh R. Patel - Lecturer (Mechanical)
+15. Mr. Pradipkumar M. Patel - Lecturer (Mechanical)
+16. Mr. Mehulkumar K. Modh - Lecturer (Mechanical)
+17. Mr. Chetankumar N. Desai - Lecturer (Mechanical)
+18. Mr. Rakesh H. Prajapati - Lecturer (Mechanical)
+19. Mr. Shivam R. Modi - Lecturer (Mechanical)
+20. Mr. Dineshkumar K. Dabhi - Lecturer (Mechanical)
+21. Mrs. Bhoomiben C. Patel - Lecturer (Mechanical)
+22. Mr. Brijeshkumar D. Patel - Lecturer (Mechanical)
+23. Mr. Jigneshkumar D. Patel - Lecturer (Mechanical)
+24. Mr. Mahendrakumar C. Patel - Lecturer (Mechanical)
+
+16. MECHANICAL ENGINEERING - FACILITIES
+-----------------------------------------------------------------------------
+- CAD Laboratory: Provides practical exposure to modern computer-aided design and drafting technologies. Equipped with advanced computer systems and software such as AutoCAD and SolidWorks for designing, modeling, and simulation. Students develop skills in 2D drafting, 3D modeling, assembly design, and engineering drawing as per industrial standards. Supports academic learning, project work, and research activities.
+- Mechanical Workshop: Provides hands-on practical training in various manufacturing and fabrication processes. Equipped with modern machines and tools such as Vertical Milling machine and Lathe machine. Helps students develop technical skills, safety awareness, precision, and problem-solving abilities through practical exposure; prepares them for careers in manufacturing, production, maintenance, and industrial engineering.
+- Drawing Hall: Designed to develop students' engineering drawing and visualization skills. Spacious hall with drawing tables, drafting instruments, and modern teaching aids. Students learn orthographic projections, sectional views, isometric drawings, machine components, and production drawings as per engineering standards. Supports manual drafting and conceptual design learning, and strengthens the foundation for design, manufacturing, CAD applications, and engineering communication.
+
+17. CIVIL ENGINEERING DEPARTMENT - OVERVIEW
+-----------------------------------------------------------------------------
+- Program: Diploma in Civil Engineering (Full-time), Duration: 3 Years.
+- The Civil Engineering Department is a core division of this government institution, established in 1961.
+- Affiliation: GTU. Approval: AICTE.
+- Seat Intake: 120 seats (AICTE). Supernumerary seats 30, TFWS 7, total seats for admission 157.
+- Eligibility: Completion of 10th standard with a minimum of 35% marks.
+- Fees: Extremely affordable as a government institute, with total tuition fees around Rs. 3,000 for the duration (as stated on the department page).
+- Curriculum: Covers essential subjects like Surveying, Building Technology, Structural Engineering, and Geotechnical Engineering.
+- Department strengths (as stated on the department page): Faculty rated highly by students (approx. 4.75/5), qualified and give in-depth explanations of core concepts. Labs equipped for practical engineering training.
+- Placements (as stated on the department page): Notable recruiters for the institute include L&T, ArcelorMittal Nippon Steel India, Shapoorji Pallonji Group, Opal ONGC Petro Additions Pvt Ltd and various construction/contracting firms.
+
+18. CIVIL ENGINEERING - FACULTY TEAM
+-----------------------------------------------------------------------------
+1. Patel Hiteshkumar Trikamlal - Lecturer (In-charge HOD)
+2. Bhargav Maheshkumar Makwana - Lecturer
+3. Jayantibhai Amrutbhai Patel - Lecturer
+4. Jaydipkumar T. Patel - Lecturer
+5. Pankitkumar Punamchand Prajapati - Lecturer
+6. Chirag H. Thakkar - Lecturer
+7. Panchal Himalaykumar Shankarlal - Lecturer
+8. Mukeshkumar Nanjibhai Suthar - Laboratory Assistant
+
+19. CIVIL ENGINEERING - LABORATORIES
+-----------------------------------------------------------------------------
+- Computer Aided Graphics Laboratory: High-tech computer lab with internet facility.
+- Hydraulics Laboratory: Well equipped lab instruments for Hydraulics subject.
+- Transportation Engineering Laboratory: Well equipped lab with instruments.
+- Water Supply and Sanitary Engineering Laboratory.
+
+20. APPLIED MECHANICS DEPARTMENT (SUPPORT DEPARTMENT FOR CIVIL & MECHANICAL)
+-----------------------------------------------------------------------------
+- About: Applied Mechanics is a core engineering discipline that applies principles of mechanics to solve real-world problems in structures, materials, and fluids. It bridges theoretical physics with practical applications in civil and mechanical engineering.
+- Core Focus: Statics (forces in equilibrium), dynamics (motion and acceleration), and strength of materials (stress, strain, deformation). Essential for diploma students of civil or mechanical engineering to analyze beams, trusses, friction, and centroids. Labs emphasize experiments like verifying laws of motion and testing material properties.
+- Department strengths: Strong foundation in engineering concepts; Well-equipped laboratories (Applied Mechanics Laboratory with testing equipment, material testing and strength analysis facilities, demonstration models); Practical and skill-based learning (hands-on experiments, real-life problem solving, mini projects); Experienced, student-friendly faculty.
+- Key Disciplines Covered:
+  * Engineering Mechanics: Fundamental knowledge of forces, motion, equilibrium, and mechanics principles; analytical and problem-solving skills for civil engineering; supports competitive exam and technical interview preparation.
+  * Mechanics of Structures: Structural behavior under different loads; stress, strain, bending, shear force, and deflection; analysis of beams, columns, trusses, and structural members.
+  * Soil Engineering: Soil properties and behavior; soil classification, permeability, compaction, and consolidation; foundation design; soil testing and field investigation methods.
+  * Concrete Technology: Properties of concrete ingredients; cement, aggregates, water, and admixtures; safe, economical, and sustainable construction practices.
+  * Design of Structures: Design principles for beams, slabs, columns, footings, and other structural elements; standard codes and engineering design practices.
+- Faculty:
+  * 1. Pragna P. Patankar - In-charge Head of Department
+  * 2. Chirag B. Patel - Lecturer
+  * 3. Nayan K. Prajapati - Lecturer
+
+21. SCIENCE & HUMANITIES DEPARTMENT (FIRST YEAR DEPARTMENT)
+-----------------------------------------------------------------------------
+- About: The Department of Science and Humanities serves as the vital foundation of any Diploma Engineering institute and is often referred to as the "First Year Department". It bridges secondary school education and specialized technical engineering, and equips students with the fundamental principles that underpin every engineering discipline.
+- Core Purpose: To nurture a scientific temperament and provide students with the analytical tools they need for professional subjects (physics, mathematics, and logic).
+- Key Disciplines Covered:
+  * Engineering Mathematics: Algebra, trigonometry, and calculus - the "language of engineering".
+  * Engineering Physics: Laws of nature, from mechanics and optics to acoustics and semiconductors.
+  * Engineering Chemistry: Material properties, corrosion, water treatment, and lubricants.
+  * Communication Skills (English): Professional writing, presentation skills, and verbal fluency.
+- GTU Framework: Outcome-based curriculum. The department typically manages the Induction Program, a mandatory GTU initiative to help new students transition into the professional college environment through creative arts, universal human values, and physical activities.
+- Laboratories:
+  * Applied Physics Lab: Dimension measuring instruments (Vernier Callipers, Micrometer screw gauge, Spherometer), material properties apparatus (Hooke's law, surface tension and viscosity apparatus), centripetal force apparatus, simple pendulum and photogate setup, sound and acoustics apparatus (electrical vibrator/Melde's apparatus), resonance tube apparatus, heat and thermometry apparatus such as linear thermal expansion apparatus.
+  * Modern Physics Lab: Dimension measuring instruments, capacitance measuring apparatus (parallel plate capacitor, series and parallel connection of resistance and capacitors), sound and acoustics apparatus, resonance tube apparatus, semiconductor devices (PN junction diode, Zener diode, half wave, full wave and bridge rectifier), logic gates and De Morgan's theorem kit.
+  * Chemistry Lab: Modern apparatus for chemical analysis.
+  * Language Lab: Software-based training to improve phonetics and soft skills.
+- Career Development: Builds logical reasoning, professional ethics, and adaptability for students who move on to Civil, Mechanical, Computer or Electrical branches.
+- Faculty (all Lecturers):
+  * 1. Dr. R. L. Revadiwala
+  * 2. Dr. U. A. Patel
+  * 3. H. A. Darji
+  * 4. A. B. Patel
+  * 5. R. M. Chaudhary
+  * 6. Dr. M. P. Patel
+  * 7. Dr. P. V. Yadav
+  * 8. A. R. Oza
+
+=============================================================================
+INSTITUTE-LEVEL FACILITIES & CAMPUS LIFE
+=============================================================================
+
+22. LIBRARY
+-----------------------------------------------------------------------------
+- Location (Facilities page): First floor of LRUC Building; total carpet area 327 square meters; reading space 150 square meters. Sections: library office, E-library (PCs and internet to access online books, journals, magazines), newspaper reading area, book issue and return area, stack area, reference section, and magazine section.
+- Library page details: Carpet area length 25.27 m, breadth 24.28 m, height 3.05 m; Reading space 51.50 sq m; Number of seats in reading space: 50.
+- Timings: Facilities page: Monday to Friday and working Saturday, 10:30 AM to 5:30 PM (Sunday and public holidays closed). Library page: Monday to Saturday, 10:30 AM to 6:10 PM.
+- Internet in library: BSNL Broadband 300 Mbps, BSNL Leased Line 10 Mbps, NAMO Wi-Fi 100 Mbps.
+- Usage: About 5 users (issue book) per day and about 5 users (reading space) per day.
+- Library Management: Software e-Granthalaya. Computerization for search/indexing: No. Issue/return barcoding: No. Library services on Internet/Intranet: Internet.
+- Books: 8,804 titles and 22,094 volumes in total. Reference books: 266 titles, 410 volumes.
+- New additions: 2023-24: 13 titles / 31 volumes; 2024-25: 157 titles / 157 volumes; 2025-26: 57 titles / 102 volumes.
+- Journals: Hard copy journals: 6 (2022-23), 6 (2023-24), 7 (2025-26). Soft copy: ONOS (One Nation One Subscription - access to scholarly research content/e-journals, https://onos.gov.in/) in 2024-25 and 2025-26.
+- Periodicals / Journals / Magazines (Total 07: 06 technical, 01 non-technical): IUP Computer Science; IUP Electrical and Electronics Engineering; IUP Mechanical Engineering; Electronics for You; Open Source; Indian Concrete Journal; CSIR News.
+- Newspapers: Sandesh, Divya Bhaskar, Times of India.
+- Computing facility: 3 Computers and 1 Printer. Book Bank: Library provides books to students under RUSA.
+- Services: Reading facility, circulation, reference service, new arrivals, library orientation.
+- Library staff: Mr. Asvin Oza (Library Co-ordinator, Regular); Mrs. Bina B. Raval (Librarian, Regular); Mr. Parth Modi (Library Apprentice, Contractual).
+- Library Rules: Mobile phones not permitted inside; no eatables/drinks; readers may not bring personal books or printed material (spiral/bound/photocopied); no marking, scratching, damaging, mutilating or stealing of library material (disciplinary action); do not carry books from one floor to another and leave books on the reading table after consulting; no talking or discussion; library not responsible for loss of personal belongings; Librarian may suspend membership of anyone misbehaving.
+
+23. STUDENT SECTION
+-----------------------------------------------------------------------------
+- Purpose: To assist students with academic and administrative services: enrollment, examinations, scholarships, anti-ragging matters, student grievances, student affairs, and issuance of certificates.
+- Services: Student registration; fees payment; scholarships; admission cancellation; institute transfer; student ID card; GTU certificates; bona fide / character certificate; name correction; transcript.
+- Student Section Committee: Mr. G. S. Patel (Mechanical, Convener); Mr. A. B. Patel (Science and Humanities, Co-Convener); Mr. R. K. Prajapati (Mechanical, Member); Mr. P. M. Prajapati (Computer, Member); Mr. C. B. Patel (Electrical, Member); Mr. H. S. Panchal (Civil, Member); Smt. B. C. Patel (Mechanical, Member); Mr. V. N. Bamaniya (Admin, Member); Mr. M. P. Patel (Mechanical, Member).
+
+24. SEMINAR HALL / CONFERENCE ROOM (INSTITUTE)
+-----------------------------------------------------------------------------
+- Seats up to around 120 people. Fully air-conditioned, with large whiteboard, 2 medium-sized tables, a podium, projector and small speaker set (in the media closet).
+- State-of-the-art facility with audio system and projection. Used for guest lectures, meetings, conferences, debates, seminars, council meetings, and society events.
+
+25. RTO LEARNING LICENCE TEST CENTER
+-----------------------------------------------------------------------------
+- The institute operates an RTO Learning License Facilitation Center, a community-oriented initiative that helps citizens obtain Learning Licenses through guidance, documentation support, and awareness on road safety norms.
+- Beneficiary citizens by year: 2019: 79 | 2020: 1680 | 2021: 3581 | 2022: 4182 | 2023: 4178 | 2024: 3258 | 2025: 2597 | 2026: 444 (till 04/2026).
+
+26. INTERNET, CWAN & NAMO WI-FI INFRASTRUCTURE
+-----------------------------------------------------------------------------
+- Internet Coverage: Internet access in Labs, Classrooms, Library, and offices of all departments via wired connection (Fiber Optics and LAN connectivity) and NAMO WIFI.
 - Wi-Fi & LAN Network Metrics:
   * Total Access Points: 14 Access Points
   * Leased Line Speed: 10 MBPS
   * Broadband Speed: 300 MBPS
   * NAMO WIFI Speed: 100 MBPS
-- Security & Firewall: WatchGuard Security Appliance (CWAN gateway).
+- Security & Firewall: WatchGuard Security Appliance (CWAN gateway) purchased 18-01-2008, license validity 5 years, DTE Order ERC/5507/CWAN/EO2/B/34/3, amount Rs. 4,70,080. As stated on the website, due to license expiry the firewall security system is currently not working properly.
+- Maintenance: The institute assigns an AMC every year for CWAN (Campus Wide Area Network). In 2020 the AMC was assigned to Vardhan Infys Pvt Ltd, Ahmedabad through GeM (Government e-Marketplace).
 
-8. GYMKHANA & EXTRA-CURRICULAR ACTIVITIES
+27. GYMKHANA, SPORTS & EXTRA-CURRICULAR ACTIVITIES
 -----------------------------------------------------------------------------
-- Sports & Games: Chess, basketball, cricket, volleyball, badminton, table tennis.
-- Cultural Events: Essay writing, webinars, drawing competitions, cultural festivals.
+- Sports & Games: Chess, basketball, cricket, football, hockey, volleyball, badminton, table tennis, kabaddi, kho-kho.
+- The college has been excelling in sports for decades. Every year it holds Sports Carnival, Inter-class matches and Sports Day. Coaching facilities are provided for different games, and the campus has a large open ground for outdoor sports.
+- Cultural Events: Essay writing, webinars, drawing competitions, cultural festivals, Navratri celebration.
 - Technical Events: Coding competitions, hackathons, and technical seminars.
-- Social & National Days: Independence Day, Youth Day, Signature Day celebrations.
+- Social & National Days: Independence Day, Republic Day, Youth Day, Signature Day celebrations.
+- Gymkhana Portfolio: Organizes tree plantation drives, awareness rallies on anti-addiction (Nasha Bandhi), Navratri celebrations, Sports Week, and Thalassemia testing camps to build leadership, teamwork, fitness and cultural values.
+- Gymkhana Committee (Sports page): R. H. Prajapati (Convener, Mechanical); U. A. Patel (Co-Convener, General); P. M. Prajapati (Member, Computer); P. R. Mishra (Member, Electrical); P. M. Patel (Member, Mechanical); H. S. Panchal (Member, Civil); N. J. Patel (Member, Computer); M. C. Thakor (Member, Computer).
+- Gymkhana Committee (older listing on Facilities page): Mr. R. D. Modi (Electrical, Convener); Mr. R. H. Prajapati (Mechanical, Co-Convener); Mr. J. T. Patel (Civil); Mr. J. D. Patel (Mechanical); Mr. K. A. Prajapati (Electrical); Mr. U. A. Patel (Science and Humanities); Mr. P. M. Prajapati (Computer).
+- Gymkhana Convener's roles: plan, organize and supervise all Gymkhana events; coordinate cultural, sports and social programs (rallies, celebrations, awareness campaigns); guide students in extracurricular and community activities; maintain discipline and teamwork; communicate with institute authorities.
+- Gymkhana Members' roles: assist in organizing sports, cultural and social activities; encourage participation and discipline; support awareness activities (tree plantation, Nasha Bandhi rallies, health camps); coordinate with the convener; promote teamwork and leadership.
+- Gymkhana activities performed in 2025: Road Safety Seminar (22 Jan); Republic Day Celebration (26 Jan); Sports Week & Day Celebration (12-15 Feb); Thalassemia Test (18 Feb); Mental Well-Being Seminar (8 Apr); Fire Safety Awareness Workshop (22 Apr); Atal Bihari Bajpai 100th Janma Jayanti (25 Apr); "Obesity free Gujarat, Healthy Gujarat" (2 May); NICE-25 (1 May); LOI_sports (22 May); Environment Week (22 May to 5 Jun); Yog Shibir-2025 (11-13 Jun); Shradhhanjali Shabha (16 Jun); Tree Plantation (5 Jul); Har Ghar Tiranga (11-15 Aug); Flag Hosting - Independence Day (15 Aug); Nashamukti (1 Aug); Navratri (26 Sep); Vikas Saptah (7-15 Oct); Rashtriya Ekta Diwas (30 Oct); Vandematram@150 (7 Nov); Bhagvan Birsa Munda (7-13 Nov); Sardar Vallabhbhai Patel-150 (26 Nov to 6 Dec); Thalassemia Test (2 Dec); Veer Bal Divas (26 Dec).
+- Gymkhana activities performed in 2026: Republic Day (26 Jan); Fire Safety Awareness Workshop (28 Jan); Thalassemia test of remaining students (11 Feb); Sports Week Celebration (5-7 Mar); Kaynes_Sanand-2026 (31 Mar).
 
-9. HOSTEL FACILITIES & ADMINISTRATION
+28. NATIONAL SERVICE SCHEME (NSS)
 -----------------------------------------------------------------------------
+- The NSS unit of K. D. Polytechnic, Patan develops students' personality through community service and social responsibility, under the guidance of the Program Officer. Its main objective is to instill the spirit of service, leadership, teamwork, and national integration.
+- Key activities: Fit India Freedom Run; tribute programs on Shaheed Bhagat Singh Jayanti; Independence Day and Republic Day celebrations; community outreach programs; Plogging Run - "Say No to Single-Use Plastic"; awareness programs on Nashabandhi (de-addiction), Dahej Pratha Nivaran (dowry eradication), Bhrun Hatya Nivaran (female foeticide prevention); drawing competitions and seminars on social issues; Janjagruti (awareness) rallies; World Sparrow Day; Tree Plantation Programme; International Yoga Day.
+- Mission: To develop socially responsible and disciplined citizens; promote environmental awareness and sustainability; create awareness about social evils and public health issues; encourage youth participation in community development.
+- NSS Committee: Shri H. S. Panchal (Civil) - NSS orientation, awareness campaign, planning and conducting camps, NSS activity calendar; Shri U. A. Patel (General) - budget, fund allocation, bill submission, audit, grant utilization certificate, PFMS work; Shri P. M. Prajapati (Computer) - NSS calendar display, NSS portal update (NSG/CTU), data upload, Google Drive records, newsletter, SMS communication; Shri P. M. Patel (Mechanical) - NSS activities calendar implementation, university/state/national level nomination, student data presentation; Shri P. R. Mishra (Electrical) - activity roadmap preparation, student participation record, encourage participation in events.
+
+29. ALUMNI ASSOCIATION
+-----------------------------------------------------------------------------
+- Alumni Association Registration (KDPAA): Registration fee Rs. 300, joined through a Google Form. The fee supports alumni activities, networking events, student mentoring programs, career guidance sessions, and institutional development initiatives. Registered alumni become part of a lifelong professional network.
+- Alumni Meet 2025: Organized on 25 December 2025 at the Convention Hall, HNG University.
+
+30. HOSTEL FACILITIES & ADMINISTRATION
+-----------------------------------------------------------------------------
+- Separate hostel accommodation for boys and girls with well-maintained rooms and essential amenities. The hostel environment promotes discipline, cultural harmony, and mutual cooperation, with cleanliness, security and student welfare monitored by the hostel authorities.
 - Hostel Administration:
   * Hostel Rector: Shri D. K. Raval
   * Boys Hostel Warden: Shri H. V. Thakkar
   * Girls Hostel Warden: Mrs. B. S. Sevkani
 - Boys Hostel (New Boy's Hostel):
   * Total Rooms: 32 Rooms
-  * 3-Seater Rooms: 32 Rooms (Total 96 beds capacity)
-  * Total Student Capacity: 96 Students
+  * Total Student Capacity: 96 Students (3-seater rooms)
 - Girls Hostel:
   * Total Rooms: 28 Rooms
-  * 3-Seater Rooms: 16 Rooms (Total 84 beds capacity)
-  * Total Student Capacity: 84 Students
+  * Total Student Capacity: 84 Students (the website's table lists "3-Seater Rooms: 16")
 - Amenities Available in Hostels:
   * Well-furnished rooms with beds, study tables, chairs.
   * 24/7 RO purified drinking water facility.
@@ -144,16 +435,66 @@ Information Technology (IT) branch is NOT offered at K. D. Polytechnic Patan. If
   * Solar water heating system.
   * CCTV surveillance and 24/7 security guards.
   * Clean, well-maintained campus and green garden.
-- Admission & Fees: Allotment as per ACPDC/Government hostel admission norms. Application form available from Rector/Warden office. Online hostel payment link available on website.
+- Admission & Fees: Allotment as per institute and ACPDC/Government hostel admission norms. Hostel admission form is available from the Rector/Warden office. Online hostel fee payment link is available on the website.
 
-10. ADMISSIONS, FEES & SCHOLARSHIPS GROUND TRUTH
+31. CANTEEN
 -----------------------------------------------------------------------------
-- Admission Gateway: Centralized ACPDC Gujarat (https://acpdc.gujarat.gov.in) based on 10th SSC merit.
+- The college canteen offers a relaxed atmosphere where students can unwind, study, or spend time with friends. It serves cold drinks, juices, milk beverages, filtered water, and snacks such as chips, biscuits, sweets, and other quick bites. It has a spacious seating area and polite, attentive staff.
+
+32. ADMISSIONS, FEES & SCHOLARSHIPS GROUND TRUTH
+-----------------------------------------------------------------------------
+- Admission Gateway: First-year diploma admission is managed centrally by the Admission Committee for Professional Diploma Courses (ACPDC), Gujarat, based on 10th SSC merit. Latest updates: https://acpdc.gujarat.gov.in (the college website also shows https://acpc.gujarat.gov.in/). Registration and admission process: gujdiploma.admissions.nic.in
+- ACPDC Office: ACPC Building 2nd Floor, L D College of Engineering Campus, Ahmedabad - 380015. Help Line (8 am to 12 am): 079-26566000. Email: acpdcinfo@gmail.com
+- ACPDC also shares admission updates on Facebook, Instagram (https://www.instagram.com/acpdcinfo), YouTube and WhatsApp channels.
+- Eligibility: SSC / 10th Standard pass with minimum 35% marks.
+- Application Process: Online application through ACPDC Gujarat. Program duration: 3 Years Diploma Program.
 - Annual Tuition Fees:
-  * Boys: Approx. ₹1,000 to ₹1,500 per year.
+  * Boys: Approx. Rs. 1,000 to Rs. 1,500 per year.
   * Girls: 100% Tuition Fee Exemption under the Government "Kanya Kelavani" scheme (Completely free tuition).
+- Online Tuition Fee Payment: Students can pay tuition fees online through the college's Qfix payment portal (https://www.eduqfix.com/PayDirect/#/student): enter student details, select fee category, choose payment method, and download the receipt.
 - Scholarships:
-  * MYSY (Mukhyamantri Yuva Swavalamban Yojana): 80+ percentile in 10th SSC, annual family income <= ₹6,00,000.
+  * MYSY (Mukhyamantri Yuva Swavalamban Yojana): 80+ percentile in 10th SSC, annual family income <= Rs. 6,00,000.
   * Digital Gujarat Portal (https://www.digitalgujarat.gov.in): Post-matric scholarships for SC, ST, SEBC/OBC, and EWS students.
 - GTU Rules: Minimum 75% attendance mandatory. Max 4 backlogs from Sem 1 & 2 allowed for entry into Sem 5.
+
+33. ANTI-RAGGING INFORMATION
+-----------------------------------------------------------------------------
+- In compliance with Supreme Court directives (Civil Appeal No. 887 of 2009), the UGC (Government of India) has established an official anti-ragging portal: https://www.antiragging.in/ . It collects online undertakings from every student and parents/guardians and maintains records of ragging complaints and actions taken.
+- Anti-Ragging Cell & Squad: Dr. C. D. Patel (Convenor); R. D. Modi (Co-Convenor); K. S. Patel, J. A. Patel, R. M. Chaudhary, Smt. B. R. Sevkani (Members).
+- Mandatory undertaking: Compulsory for all students and parents/guardians, submitted separately on antiragging.in and amanmovement.org. After submission, forward the confirmation email to principalkdp631@gmail.com
+- National Anti-Ragging Helpline: 1800-180-5522 (24x7, toll-free). Email: helpline@antiragging.in
+- Ragging cases observed: NIL in every academic year from 2019-20 to 2024-25.
+
+34. ADMINISTRATION & STAFF
+-----------------------------------------------------------------------------
+- Admin Staff:
+  * Shri N. T. Tapodhan - Senior Clerk (Establishment)
+  * Shri B. J. Patel - Senior Clerk (Accounts)
+  * Shri M. P. Patel - Senior Clerk (Cashier)
+  * Kum. R. D. Patel - Senior Clerk (Registry)
+  * Shri R. N. Katara - Junior Clerk (Registry)
+  * Smt. B. B. Raval - Librarian (Library)
+  * Shri V. N. Bamaniya - Assistant Lecturer (Student Section)
+  * Shri J. J. Parnar - Curator (Civil / Applied Mechanics)
+  * Shri M. N. Suthar - Laboratory Assistant, Civil (Civil)
+  * Kum. Mayuri Prajapati - Apprentice (Office)
+- Supporting Staff: Shri R. K. Patani (Mali); Shri C. G. Rathod (Hamal); Shri K. S. Bamcha (Hamal); Shri R. I. Majirana (Hamal); Shri S. P. Sadhu (Peon); Smt. M. H. Bhil (Peon).
+- Role of the administrative team: Manages establishment matters, student section activities, official records (registry), accounts, fee management, and library support to ensure smooth day-to-day functioning.
+
+35. ORGANIZATIONAL STRUCTURE
+-----------------------------------------------------------------------------
+- The website shows two charts: the Directorate of Technical Education (DTE) chart and the Institute Organizational Chart.
+- Institute chart: The Principal heads the institute. Reporting heads: Head, Human Resource (Faculty & Staff); Head, Student Affairs (NCC, NSS, Alumni Association, Gymkhana, admission help centre, GTU coordinators, student section, scholarships, anti-ragging); Head, Academics (Centre of Excellence, AICTE/NBA/GTU affiliation work, first-year semester exam and time-table coordination); Head, Store Purchase; Head, Infrastructure & Maintenance (security, CCTV, civil works, electrical, CWAN, internet, institute website); Head, Industry & Outreach (placement cell, industry linkage, MOU, newsletter, brochures, skill development); Head, Academic Department (academic staff, library, hostel administration, medical facilities, canteen and student store); Head, Amenities (conference hall, auditorium, seminar hall allocation, centralized computer centres).
+- DTE chart: Education Minister -> Principal Secretary Education (Higher and Technical) -> Director of Technical Education -> Directorate of Technical Education (Joint Directors for Establishment, Budget/Planning/Procurement/Training, Academic and Legal, and Account), the Technical Examination Board, and the Gujarat Knowledge Society.
+
+36. CAMPUS EVENTS & STUDENT TESTIMONIALS
+-----------------------------------------------------------------------------
+- Recent campus events: Plastic free campus drive in KDP College Campus (19 May 2026); Seminar on "Energy & Environment Conservation Awareness Program" for Computer Engg Dept (1 May 2026); Seminar on "Menstrual Hygiene" (24 Mar 2026); Seminar on Mechanisms for Protection and Effective Response to Sexual and Mental Harassment (9 Mar 2026); Theory cum Practical Energy & Environment Conservation Awareness Program (5 Jan 2026); Seminar on "Creating Safe, Respectful and Inclusive Workplace - POSH & POSCO Act" (18 Jul 2026).
+- Gallery highlights: NPTEL Discipline Stars certificates, Vikas Saptah 2025, Yoga Day 2025, Sports Week 2026 trophy distribution.
+- Student testimonials: Suraj (Mechanical Engineering, 2025), Namra (Computer Engineering, 2024) and Daksh (Civil Engineering, 2025) praise the well-structured lectures, practical focus, and clear explanations of faculty.
+
+37. NOTES FOR THE CHATBOT
+-----------------------------------------------------------------------------
+- Timetables, exam results, notice-board notices, and fee notices change frequently and are NOT included in this knowledge base. For these, direct students to the official website https://kdppatan.ac.in (Notice Board / department pages) or the college office on 02766220419.
+- If information is not found in this file, say that it is not available instead of guessing.
 =============================================================================
